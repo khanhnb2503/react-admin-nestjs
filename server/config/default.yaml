@@ -1,0 +1,28 @@
+service:
+  name: egd-admin
+  url: http://localhost:4000
+  baseUrl: /
+
+server:
+  host: 127.0.0.1
+  port: 4000
+
+logger:
+  level: debug
+  autoLogging: false
+
+user:
+  avatarUrl: https://firebasestorage.googleapis.com/v0/b/livestream-26075.appspot.com/o/avatar_default.jpg?alt=media
+  signupBonusAmount: 5000
+
+jwt:
+  accessSecret: ''
+  refreshSecret: ''
+  accessExpiresIn: 3d
+  refreshExpiresIn: 30d
+
+firebase:
+  projectId: ''
+  privateKey: ''
+  clientEmail: ''
+  databaseURL: ''
