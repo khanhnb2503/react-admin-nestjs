@@ -15,14 +15,15 @@ import configuration from 'src/config/configuration';
 import { AppService } from './app.service';
 import { GroupsModule } from '../groups/groups.module';
 import { PermissionsModule } from '../permissions/permissions.module';
-import { roles } from 'src/roles/app.role';
+// import { roles } from 'src/roles/app.role';
+import { RolesGuard } from 'src/guards/roles.guard';
 
 @Module({
   imports: [
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', '..', '..', 'public'),
     }),
-		AccessControlModule.forRoles(roles),
+		// AccessControlModule.forRoles(roles),
     ConfigModule.forRoot({
       isGlobal: true,
       load: [configuration],
@@ -61,10 +62,10 @@ import { roles } from 'src/roles/app.role';
   controllers: [AppController],
   providers: [
 		AppService,
-		// {
-		// 	provide: APP_GUARD,
-		// 	// useClass: RolesGuard
-		// }
+		{
+			provide: APP_GUARD,
+			useClass: RolesGuard
+		}
 	],
 })
 export class AppModule {}

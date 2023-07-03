@@ -17,7 +17,7 @@ export class PermissionName {
   name: string;
 }
 
-export class PermissionType {
+export class PermissionId {
 	@ApiProperty({
     description: 'Id permission',
   })
@@ -26,16 +26,15 @@ export class PermissionType {
 
 @Collection('groups')
 export class GroupEntity extends BaseEntity {
-	@ApiPropertyOptional({
+	@ApiProperty({
 		description: 'Group name'
 	})
 	@IsString()
-	@IsOptional()
 	@Transform(({ value }: { value: string }) => value.trim())
-	name?: string;
+	name: string;
 
 	@ApiProperty({
-		description: "1 group chứa tất cả các vai trò",
+		description: "Groups chứa nhiều permission",
 		type: [PermissionName],
 		isArray: true
 	})

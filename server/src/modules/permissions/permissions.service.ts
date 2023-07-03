@@ -20,7 +20,7 @@ export class PermissionsService {
 		const existPermission = await this.checkExistPermissionName(permissionDto.name);
 		if(existPermission) {
 			throw new ConflictException({
-				message: 'Permission đã tồn tại'
+				message: 'Permission name đã tồn tại'
 			})
 		};
 

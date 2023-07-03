@@ -6,7 +6,7 @@ import {CreateGroupDto} from './dto/create-group.dto';
 import {UpdateGroupDto} from './dto/update-group.dto';
 import {AccessTokenGuard} from 'src/guards/access-token.guard';
 import {User, RequestUser} from 'src/decorators/user.decorator';
-import {PermissionType} from './entities/group.entity';
+import {PermissionId} from './entities/group.entity';
 import {GroupEntity} from './entities/group.entity';
 
 @ApiTags('Groups')
@@ -18,7 +18,7 @@ export class GroupsController {
 
 	@Post()
 	@ApiOperation({
-		description: 'Tạo mới groups',
+		description: 'Tạo groups',
 	})
 	create(
 		@Body() createGroupDto: CreateGroupDto,
@@ -59,25 +59,25 @@ export class GroupsController {
 		return this.groupsService.remove(id);
 	}
 
-	@Post('permission/:id')
+	@Post('add-permission/:id')
 	@ApiOperation({
 		description: 'Thêm quyền vào groups',
 	})
-	@ApiBody({ type: PermissionType })
-	addPermission(
+	@ApiBody({ type: PermissionId })
+	addPermissionToGroup(
 		@Param('id') id: string,
 		@Body() permissionId: any, 
 	): Promise<GroupEntity> {
 		return this.groupsService.addPermission(id, permissionId);
 	};
 
-	@Post('unPermission/:id')
+	@Post('un-permission/:id')
 	@ApiOperation({
 		description: 'Xóa quyền khỏi groups',
 	})
-	@ApiBody({ type: PermissionType })
-	deletePermission(
-		@Param('id') id: any,
+	@ApiBody({ type: PermissionId })
+	unPermissionToGroup(
+		@Param('id') id: string,
 		@Body() permissionId: any, 
 	): Promise<GroupEntity> {
 		return this.groupsService.unPermission(id, permissionId);
