@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { FireormModule } from 'nestjs-fireorm';
 
 import { UsersModule } from '../users/users.module';
@@ -10,10 +10,11 @@ import { PermissionsModule } from '../permissions/permissions.module';
 @Module({
 	imports: [
 		FireormModule.forFeature([GroupEntity]),
-		UsersModule,
+		forwardRef(() => UsersModule),
 		PermissionsModule
 	],
   controllers: [GroupsController],
-  providers: [GroupsService]
+  providers: [GroupsService],
+	exports: [GroupsService],
 })
 export class GroupsModule {}

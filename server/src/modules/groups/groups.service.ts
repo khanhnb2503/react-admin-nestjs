@@ -1,4 +1,4 @@
-import {ConflictException, Injectable, NotFoundException} from '@nestjs/common';
+import {ConflictException, Inject, Injectable, NotFoundException, forwardRef} from '@nestjs/common';
 import {InjectRepository} from 'nestjs-fireorm';
 import {BaseFirestoreRepository, createBatch} from 'fireorm';
 
@@ -6,7 +6,6 @@ import {GroupEntity} from './entities/group.entity';
 import {CreateGroupDto} from './dto/create-group.dto';
 import {UpdateGroupDto} from './dto/update-group.dto';
 import {RequestUser} from 'src/decorators/user.decorator';
-import {UsersService} from '../users/users.service';
 import { PermissionsService } from '../permissions/permissions.service'; 
 import {PermissionId} from './entities/group.entity';
 
@@ -15,7 +14,6 @@ export class GroupsService {
 	constructor(
 		@InjectRepository(GroupEntity)
 		private repoGroup: BaseFirestoreRepository<GroupEntity>,
-		private userService: UsersService,
 		private permissionsService: PermissionsService
 	) { }
 

@@ -6,17 +6,16 @@ import {UsersService} from './users.service';
 import {CreateUserDto} from './dto/create-user.dto';
 import {UpdateUserDto} from './dto/update-user.dto';
 import {AccessTokenGuard} from 'src/guards/access-token.guard';
+import { RolesGuard } from 'src/guards/roles.guard'; 
 import {User, RequestUser} from 'src/decorators/user.decorator';
-import { RolesGuard } from 'src/guards/roles.guard';
-import { Role } from 'src/decorators/role.decorator';
-import { Roles } from 'src/roles/app.role';
+import { Roles } from 'src/decorators/role.decorator';
+import { Role } from 'src/roles/app.role';
+
 
 @ApiTags('User')
 @Controller('users')
 @ApiBearerAuth()
-@UseGuards(AccessTokenGuard)
-@UseGuards(RolesGuard)
-
+@UseGuards(AccessTokenGuard, RolesGuard)
 export class UsersController {
 	constructor(private readonly usersService: UsersService) { }
 
@@ -29,6 +28,7 @@ export class UsersController {
 	}
 
 	@Get()
+	@Roles(Role.ADMIN)
 	async findAll(
 		@Response() res: Res,
 		@Query() query: any,
@@ -43,7 +43,6 @@ export class UsersController {
 	}
 
 	@Get(':id')
-	@Role(Roles.ADMIN)
 	findOne(@Param('id') id: string) {
 		return this.usersService.findOne(id);
 	}

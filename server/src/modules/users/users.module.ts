@@ -1,21 +1,15 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { FireormModule } from 'nestjs-fireorm';
 import { UserEntity } from './entities/user.entity';
 
 import { UsersService } from './users.service';
 import { UsersController } from './users.controller';
-import {JwtModule} from '@nestjs/jwt';
-import { ConfigService } from '@nestjs/config';
+import { GroupsModule } from '../groups/groups.module';
 
 @Module({
 	imports: [
-		JwtModule.registerAsync({
-			inject: [ConfigService],
-			useFactory: async (configServer: ConfigService) => ({
-				secret: configServer.get<string>('jwt.accessSecret')
-			})
-		}),
 		FireormModule.forFeature([UserEntity]),
+		GroupsModule
 	],
   controllers: [UsersController],
   providers: [UsersService],

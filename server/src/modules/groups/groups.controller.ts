@@ -1,5 +1,6 @@
-import {Controller, Get, Post, Body, Param, Delete, Put, UseGuards} from '@nestjs/common';
+import {Controller, Get, Post, Body, Param, Delete, Put, UseGuards, Response} from '@nestjs/common';
 import {ApiTags, ApiBearerAuth, ApiOperation, ApiBody} from '@nestjs/swagger';
+import {Response as Res} from 'express';
 
 import {GroupsService} from './groups.service';
 import {CreateGroupDto} from './dto/create-group.dto';
@@ -31,8 +32,12 @@ export class GroupsController {
 	@ApiOperation({
 		description: 'Danh sách groups',
 	})
-	findAll() {
-		return this.groupsService.findAll();
+	async findAll(@Response() res: Res,) {
+		const groups = await this.groupsService.findAll();
+		return res.set({
+			'Access-Control-Expose-Headers': 'Content-Range',
+			'Content-Range': '0-5/10'
+		}).json(groups);
 	}
 
 	@Get(':id')

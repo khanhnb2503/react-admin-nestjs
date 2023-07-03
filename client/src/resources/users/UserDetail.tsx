@@ -9,7 +9,7 @@ type IUser = {
 	address: string;
 }
 
-import fakeApi from "../fakeApi";
+import fakeApi from "../../fakeApi";
 
 const params = {
 	pagination: {page: 1, perPage: 5},
@@ -26,7 +26,6 @@ export const UserDetail =  () => {
 			const { data } = await dataProvider.getOne('users', { id: id});
 			getUser(data);
 			const usersData = await fakeApi.getList('users', params);
-			console.log(usersData);
 		})()
 	},[]);
 

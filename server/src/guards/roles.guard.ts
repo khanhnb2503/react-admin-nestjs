@@ -1,8 +1,9 @@
-import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
+import { Injectable, CanActivate, ExecutionContext, ForbiddenException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { ROLES_KEY } from 'src/decorators/role.decorator';
 import { UsersService } from 'src/modules/users/users.service';
-import { Roles } from 'src/roles/app.role';
+import { Role } from 'src/roles/app.role';
+ 
 @Injectable()
 export class RolesGuard implements CanActivate {
 	constructor(
@@ -11,17 +12,22 @@ export class RolesGuard implements CanActivate {
 	) {}
 
 	async canActivate(context: ExecutionContext): Promise<boolean>{
-		let requireRoles = this.reflector.getAllAndOverride<Roles[]>(ROLES_KEY, [
+		let requireRoles = this.reflector.getAllAndOverride<Role[]>(ROLES_KEY, [
 			context.getHandler(),
 			context.getClass()
 		]);
+		
 		if(!requireRoles) return true;
 
-		let exitsRole: boolean;
 		const { user } = context.switchToHttp().getRequest();
-		if(user) {
-			const users = await this.usersService.findOne(user.sub);
-		};
-		return true;
+		const users = await this.usersService.findOne(user.sub);
+		const groupName = await this.usersService.findGroupName(users.roleId);
+		const existPermission = requireRoles.some((role) => role === groupName.name);
+		if(!existPermission) {
+			throw new ForbiddenException({
+				message: "Bạn không có quyền truy cập"
+			})
+		}
+		return existPermission;
 	}
 }

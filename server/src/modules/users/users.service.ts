@@ -12,12 +12,14 @@ import {UserEntity} from './entities/user.entity';
 import {CreateUserDto} from './dto/create-user.dto';
 import {UserResponse} from './dto/user.response';
 import {RequestUser} from 'src/decorators/user.decorator';
+import { GroupsService } from '../groups/groups.service';
 
 @Injectable()
 export class UsersService {
 	constructor(
 		@InjectRepository(UserEntity)
 		private repoUser: BaseFirestoreRepository<UserEntity>,
+		private groupService: GroupsService
 	) { }
 
 	async create(userDto: CreateUserDto, user: RequestUser): Promise<UserResponse> {
@@ -43,8 +45,7 @@ export class UsersService {
 		return createUser;
 	}
 
-	async findAll(query: any): Promise<UserResponse[]> {
-		console.log(query);
+	async findAll(query: any,): Promise<UserResponse[]> {
 		
 		const page = JSON.parse(query.range);
 		const filterName = JSON.parse(query.filter);
@@ -112,6 +113,17 @@ export class UsersService {
 	async findByUsername(username: string): Promise<UserEntity> {
 		return this.repoUser.whereEqualTo('username', username).findOne()
 	};
+
+	async findGroupName(id: string) {
+		const groups = await this.groupService.findOne(id);
+		if(!groups) {
+			throw new NotFoundException({
+				message: "Group name không tồn tại"
+			})
+		};
+
+		return groups;
+	}
 
 	private async findByUserId(id: string) {
 		if (id) {
