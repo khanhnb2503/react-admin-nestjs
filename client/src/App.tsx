@@ -19,7 +19,9 @@ import {PermissionList} from './resources/permissions/PermissionList';
 import {PermissionEdit} from './resources/permissions/PermissionEdit';
 
 import { GroupList } from './resources/groups/GroupList';
+import { GroupDetail } from './resources/groups/GroupDetail';
 import Login from './page/auth/Login';
+import DashBoard from './components/Dashboard';
 
 export const App = () => (
 	<>
@@ -28,6 +30,7 @@ export const App = () => (
 			authProvider={authProvider}
 			layout={MyLayout}
 			loginPage={Login}
+			dashboard={DashBoard}
 		>
 			<Resource
 				name="users"
@@ -47,6 +50,7 @@ export const App = () => (
 			<Resource
 				name="groups"
 				list={GroupList}
+				show={GroupDetail}
 				icon={Diversity3Icon}
 			/>
 		</Admin>

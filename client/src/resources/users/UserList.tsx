@@ -5,22 +5,29 @@ import {
 	EmailField,
 	EditButton,
 	ShowButton,
-	TextInput,
+	useGetList,
 } from "react-admin";
 
-const userFilters = [
-	<TextInput source="username" label="Nhập để tìm kiếm..." alwaysOn />,
-];
-
+const sort = { field: 'username', order: 'ASC'}
 
 export const UserList = () => {
+	const { data, total, isLoading }  = useGetList('users', {
+		pagination: {page: 1, perPage: 5},
+		sort
+	});
 	return (
-		<List filters={userFilters}>
-			<Datagrid rowClick="edit">
-				<TextField source="id" />
+		<List>
+			<Datagrid 
+				data={data}
+				total={total}
+				isLoading={isLoading}
+				sort={sort}
+				rowClick="edit"
+			>
+				<TextField source="id" sortable={false} />
 				<TextField source="username" />
-				<EmailField source="email" />
-				<TextField source="address" />
+				<EmailField source="email" sortable={false}/>
+				<TextField source="address" sortable={false}/>
 				<ShowButton />
 				<EditButton />
 			</Datagrid>

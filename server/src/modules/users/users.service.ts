@@ -46,6 +46,7 @@ export class UsersService {
 	}
 
 	async findAll(query: any,): Promise<UserResponse[]> {
+		console.log(query);
 		
 		const page = JSON.parse(query.range);
 		const filterName = JSON.parse(query.filter);

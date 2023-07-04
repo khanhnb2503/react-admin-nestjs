@@ -10,12 +10,12 @@ import {User, RequestUser} from 'src/decorators/user.decorator';
 
 @ApiTags('Permissions')
 @Controller('permissions')
-@UseGuards(AccessTokenGuard)
 @ApiBearerAuth()
 export class PermissionsController {
 	constructor(private readonly permissionsService: PermissionsService) { }
 
 	@Post()
+	@UseGuards(AccessTokenGuard)
 	create(
 		@Body() createPermissionDto: CreatePermissionDto,
 		@User() user: RequestUser
