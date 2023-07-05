@@ -1,31 +1,34 @@
-import { Edit, TextInput, SimpleForm, SaveButton } from "react-admin";
+import { Edit, TextInput, SimpleForm, useGetList, SelectInput, ReferenceInput } from "react-admin";
 import { FormValidators } from '../../constants/errors';
 
 export const EditUser = () => {
-
+	const { data, isLoading } = useGetList('groups');
 	return (
 		<Edit>
 			<SimpleForm>
-				<TextInput 
+				<TextInput
 					label="Username"
-					variant="outlined" 
-					source="username" 
+					variant="outlined"
+					source="username"
 					validate={FormValidators.username}
 				/>
-				<TextInput 
+				<TextInput
 					label="Email"
 					variant="outlined"
-					source="email" 
+					source="email"
 					validate={FormValidators.email}
 				/>
-				<TextInput 
+				<TextInput
 					label="Address"
 					variant="outlined"
-					source="address" 
+					source="address"
 					validate={FormValidators.address}
 				/>
+				<ReferenceInput label="Role" source="roleId" reference="groups">
+					<SelectInput variant="outlined" source="roleId" optionText='name'/>
+				</ReferenceInput>
 			</SimpleForm>
-			
+
 		</Edit>
 	)
 }

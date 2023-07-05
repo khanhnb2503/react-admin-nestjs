@@ -4,6 +4,7 @@ export interface IRole {
 }
 
 export interface IGroups {
+  id: string | any;
   name: string;
-  roles: IRole[];
+  roles?: IRole[] | any;
 }
