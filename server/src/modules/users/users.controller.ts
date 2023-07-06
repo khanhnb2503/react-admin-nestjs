@@ -4,7 +4,6 @@ import {Response as Res} from 'express';
 
 import {UsersService} from './users.service';
 import {CreateUserDto} from './dto/create-user.dto';
-import {UpdateUserDto} from './dto/update-user.dto';
 import {AccessTokenGuard} from 'src/guards/access-token.guard';
 import { RolesGuard } from 'src/guards/roles.guard'; 
 import {User, RequestUser} from 'src/decorators/user.decorator';
@@ -13,13 +12,14 @@ import { Role } from 'src/roles/app.role';
 
 
 @ApiTags('User')
-@Controller('users')
+@Controller('api/users')
 @ApiBearerAuth()
 @UseGuards(AccessTokenGuard, RolesGuard)
 export class UsersController {
 	constructor(private readonly usersService: UsersService) { }
 
 	@Post()
+	@Roles(Role.ADMIN)
 	async create(
 		@Body() createUserDto: CreateUserDto,
 		@User() user: RequestUser,
@@ -28,7 +28,6 @@ export class UsersController {
 	}
 
 	@Get()
-	@Roles(Role.ADMIN)
 	async findAll(
 		@Response() res: Res,
 		@Query() query: any,
@@ -38,7 +37,7 @@ export class UsersController {
 		const users = await this.usersService.findAll(query);
 		return res.set({
 			'Access-Control-Expose-Headers': 'Content-Range',
-			'Content-Range': '0-5/30'
+			'Content-Range': '0-5/40'
 		}).json(users);
 	}
 
@@ -46,17 +45,18 @@ export class UsersController {
 	findOne(@Param('id') id: string) {
 		return this.usersService.findOne(id);
 	}
-
 	@Put(':id')
+	@Roles(Role.ADMIN)
 	update(
 		@Param('id',) id: string,
-		@Body() updateUserDto: UpdateUserDto,
+		@Body() updateUserDto: any,
 		@User() user: RequestUser
 	) {
 		return this.usersService.update(id, updateUserDto, user);
 	}
 
 	@Delete(':id')
+	@Roles(Role.ADMIN)
 	remove(
 		@Param('id') id: string,
 		@User() user: RequestUser

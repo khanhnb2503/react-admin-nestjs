@@ -5,6 +5,7 @@ import {BaseFirestoreRepository} from 'fireorm';
 import {PermissionEntity} from './entities/permission.entity';
 import {CreatePermissionDto} from './dto/create-permission.dto';
 import {RequestUser} from 'src/decorators/user.decorator';
+import { Errors } from 'src/constants/errors';
 
 @Injectable()
 export class PermissionsService {
@@ -19,9 +20,7 @@ export class PermissionsService {
 	): Promise<PermissionEntity> {
 		const existPermission = await this.checkExistPermissionName(permissionDto.name);
 		if(existPermission) {
-			throw new ConflictException({
-				message: 'Permission name đã tồn tại'
-			})
+			throw new ConflictException(Errors.PERMISSION_EXIST)
 		};
 
 		const createPermission = await this.repoPermission.create({
@@ -30,23 +29,19 @@ export class PermissionsService {
 		});
 
 		if(!createPermission.id) {
-			throw new ConflictException({
-				message: 'Không thể tạo permission'
-			});
+			throw new ConflictException(Errors.PERMISSION_CONFLICT);
 		};
 		return createPermission;
 	}
 
-	async findAll() {
+	async findAll(): Promise<PermissionEntity[]> {
 		return this.repoPermission.find();
 	}
 
 	async findOne(id: string): Promise<PermissionEntity> {
 		const permission = await this.findPermissionById(id);
 		if(!permission) {
-			throw new NotFoundException({
-				message: "Permission id không tồn tại"
-			})
+			throw new NotFoundException(Errors.PERMISSION_NOT_FOUND)
 		};
 		return permission;
 	}
@@ -54,9 +49,11 @@ export class PermissionsService {
 	async update(id: string, permissionDto: CreatePermissionDto) {
 		const permission = await this.findPermissionById(id);
 		if(!permission) {
-			throw new NotFoundException({
-				message: "Permission id không tồn tại"
-			})
+			throw new NotFoundException(Errors.PERMISSION_NOT_FOUND)
+		};
+		const existPermission = await this.checkExistPermissionName(permissionDto.name);
+		if(existPermission) {
+			throw new ConflictException(Errors.PERMISSION_EXIST)
 		};
 		
 		const updatePermission = await this.repoPermission.update({
@@ -66,15 +63,12 @@ export class PermissionsService {
 		return updatePermission;
 	}
 
-	async remove(id: string): Promise<PermissionEntity> {
+	async remove(id: string) {
 		const permission = await this.findPermissionById(id);
 		if(!permission) {
-			throw new NotFoundException({
-				message: "Permission id không tồn tại"
-			})
+			throw new NotFoundException(Errors.PERMISSION_NOT_FOUND)
 		};
-
-		return permission;
+		return this.repoPermission.delete(id);
 	};
 
 	private async findPermissionById(id: string) {

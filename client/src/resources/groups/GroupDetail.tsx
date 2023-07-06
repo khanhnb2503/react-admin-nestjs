@@ -1,18 +1,20 @@
+import { Modal } from 'antd';
+import axios from 'axios';
 import { Form, useGetOne } from 'react-admin';
 import { Card, Button, Grid } from '@mui/material';
 import { useState, useEffect } from 'react';
-import { Modal } from 'antd';
-import { DataGrid, GridColDef } from '@mui/x-data-grid';
-import axios from 'axios';
+import { DataGrid, GridColDef, GridRowParams } from '@mui/x-data-grid';
 import { useParams, useNavigate } from 'react-router-dom';
 
 import { baseUrl } from '../../constants/baseurl';
 import { IPermission } from '../../interfaces/permission';
 import { IGroups } from '../../interfaces/groups';
+import { groupsApi } from '../../services/groups';
+import { permissionApi } from '../../services/permission';
 
 const columns: GridColDef[] = [
-	{ field: 'id', headerName: 'ID', width: 210 },
-	{ field: 'name', headerName: 'PermissionName', width: 200 },
+	{ field: 'id', headerName: 'ID', width: 300 },
+	{ field: 'name', headerName: 'PermissionName', width: 300 },
 ];
 
 export const GroupDetail = () => {
@@ -24,29 +26,35 @@ export const GroupDetail = () => {
 	const [unPermissionIds, setUnPermissionIds] = useState<IPermission[]>([]);
 	const { data: groups, isSuccess } = useGetOne<IGroups>('groups', { id: id });
 
-	axios.defaults.headers.common['Authorization'] =
-		`Bearer ${JSON.parse(localStorage.getItem('accessToken') || '')}`;
-
 	const handleAddPermission = async () => {
-		const data = await axios.post(
-			baseUrl + `/groups/add-permission/${id}`,
-			permissionIds
-		);
-		setOpen(false);
+		try {
+			const response = await groupsApi.addPermissionToGroup(id, permissionIds);
+			setOpen(false);
+			window.location.reload();
+		} catch (error) {
+			console.log('error');
+		}
 	};
 
 	const handleUnPermission = async () => {
-		const data = await axios.post(
-			baseUrl + `/groups/un-permission/${id}`,
-			unPermissionIds
-		);
+		try {
+			const response = await groupsApi.unPermissionToGroup(id, unPermissionIds);
+			setOpen(false);
+			window.location.reload();
+		} catch (error) {
+			console.log()
+		}
 	}
 
 	useEffect(() => {
 		(async () => {
-			const { data: permission } = await axios.get(`${baseUrl}/permissions`);
-			setPermission(permission);
-		})()
+			try {
+				const { data: permission } = await permissionApi.getPermissions();
+				setPermission(permission);
+			} catch (error) {
+				console.log('error');
+			}
+		})();
 	}, []);
 
 	return (
@@ -55,11 +63,12 @@ export const GroupDetail = () => {
 				<Card sx={{ maxWidth: 900, padding: 3 }}>
 					<div>
 						<p>GROUP NAME: {groups?.name}</p>
+						<p>ROLES</p>
 					</div>
-					<p>ROLES</p>
-					{!groups?.roles ? (<h5>Chưa có quyền</h5>)
-						: (
-							<Form onSubmit={handleUnPermission} >
+					<Form onSubmit={handleUnPermission}>
+						{!groups?.roles
+							? (<h5>Chưa có quyền</h5>)
+							: (
 								<DataGrid
 									rows={groups?.roles}
 									columns={columns}
@@ -72,28 +81,27 @@ export const GroupDetail = () => {
 									checkboxSelection
 									onRowSelectionModelChange={(id: any) => setUnPermissionIds(id)}
 								/>
-								<Grid container columnSpacing={{ xs: 1, sm: 2, md: 3 }} style={{ marginTop: 16 }}>
-									<Grid item >
-										<Button
-											size="small"
-											variant="contained"
-											onClick={() => setOpen(true)}>Add
-										</Button>
-									</Grid>
-									<Grid item >
-										{groups?.roles &&
-											<Button
-												size="small"
-												color='error'
-												variant="contained"
-												type='submit'
-											>Update
-											</Button>
-										}
-									</Grid>
-								</Grid>
-							</Form>
-						)}
+							)}
+						<Grid container columnSpacing={{ xs: 1, sm: 2, md: 3 }} style={{ marginTop: 16 }}>
+							<Grid item >
+								<Button
+									size="small"
+									variant="contained"
+									onClick={() => setOpen(true)}>Add
+								</Button>
+							</Grid>
+							<Grid item >
+								{groups?.roles &&
+									<Button
+										size="small"
+										color='error'
+										variant="contained"
+										type='submit'
+									>Delete</Button>
+								}
+							</Grid>
+						</Grid>
+					</Form>
 				</Card>
 			)}
 
@@ -106,18 +114,28 @@ export const GroupDetail = () => {
 				width={700}
 			>
 				<Form onSubmit={handleAddPermission}>
-					<DataGrid
-						rows={permission}
-						columns={columns}
-						initialState={{
-							pagination: {
-								paginationModel: { page: 0, pageSize: 5 },
-							},
-						}}
-						pageSizeOptions={[5, 10]}
-						checkboxSelection
-						onRowSelectionModelChange={(id: any) => setPermissionIds(id)}
-					/>
+					<div>
+						<DataGrid
+							rows={permission}
+							columns={columns}
+							autoHeight={true}
+							checkboxSelection
+							disableRowSelectionOnClick={false}
+							onRowSelectionModelChange={(id: any) => setPermissionIds(id)}
+							style={{ marginBottom: 15 }}
+							pageSizeOptions={[5, 10]}
+							initialState={{
+								pagination: {
+									paginationModel: { page: 0, pageSize: 5 },
+								},
+							}}
+							isRowSelectable={
+								(params: GridRowParams) => (!groups?.roles)
+									? true
+									: (!groups?.roles.some((item: any) => item.id === params.id))
+							}
+						/>
+					</div>
 					<Button variant="contained" color="primary" type="submit">
 						Thêm quyền
 					</Button>

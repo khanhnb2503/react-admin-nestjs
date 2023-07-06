@@ -17,4 +17,10 @@ export const FormValidators = {
   address: [
     required('Address không được để trống')
   ],
+  permission: [
+    required('Permission không được để trống')
+  ],
+  groups: [
+    required('Tên group không được để trống')
+  ],
 }

@@ -3,6 +3,7 @@ import { Reflector } from '@nestjs/core';
 import { ROLES_KEY } from 'src/decorators/role.decorator';
 import { UsersService } from 'src/modules/users/users.service';
 import { Role } from 'src/roles/app.role';
+import { Errors } from 'src/constants/errors'; 
  
 @Injectable()
 export class RolesGuard implements CanActivate {
@@ -22,11 +23,10 @@ export class RolesGuard implements CanActivate {
 		const { user } = context.switchToHttp().getRequest();
 		const users = await this.usersService.findOne(user.sub);
 		const groupName = await this.usersService.findGroupName(users.roleId);
+		
 		const existPermission = requireRoles.some((role) => role === groupName.name);
 		if(!existPermission) {
-			throw new ForbiddenException({
-				message: "Bạn không có quyền truy cập"
-			})
+			throw new ForbiddenException(Errors.ROLE_FORBIDDEN)
 		}
 		return existPermission;
 	}

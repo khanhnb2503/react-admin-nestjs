@@ -1,7 +1,6 @@
 import {
 	ConflictException,
 	Injectable,
-	InternalServerErrorException,
 	NotFoundException
 } from '@nestjs/common';
 import {InjectRepository} from 'nestjs-fireorm';
@@ -13,6 +12,7 @@ import {CreateUserDto} from './dto/create-user.dto';
 import {UserResponse} from './dto/user.response';
 import {RequestUser} from 'src/decorators/user.decorator';
 import { GroupsService } from '../groups/groups.service';
+import { Errors } from 'src/constants/errors';
 
 @Injectable()
 export class UsersService {
@@ -26,9 +26,7 @@ export class UsersService {
 		if (userDto) {
 			const existUsernameAndEmail = await this.findByUsernameAndEmail(userDto);
 			if (existUsernameAndEmail) {
-				throw new ConflictException({
-					message: "Username hoặc Email đã tồn tại"
-				})
+				throw new ConflictException(Errors.USER_LOGIN)
 			}
 		};
 		const password = await this.hashPassword(userDto.password);
@@ -40,14 +38,12 @@ export class UsersService {
 		});
 
 		if (!createUser.id) {
-			throw new InternalServerErrorException('Lỗi khi tạo mới Users')
+			throw new ConflictException(Errors.USER_CONFLICT)
 		};
 		return createUser;
 	}
 
 	async findAll(query: any,): Promise<UserResponse[]> {
-		console.log(query);
-		
 		const page = JSON.parse(query.range);
 		const filterName = JSON.parse(query.filter);
 
@@ -118,24 +114,16 @@ export class UsersService {
 	async findGroupName(id: string) {
 		const groups = await this.groupService.findOne(id);
 		if(!groups) {
-			throw new NotFoundException({
-				message: "Group name không tồn tại"
-			})
+			throw new NotFoundException(Errors.GROUP_NOT_FOUND)
 		};
-
 		return groups;
 	}
 
 	private async findByUserId(id: string) {
-		if (id) {
-			const user = await this.repoUser.findById(id);
-			if (!user) {
-				throw new NotFoundException({
-					message: "User không tồn tại"
-				})
-			};
-			return user;
-		}
+		const user = await this.repoUser.findById(id);
+		if (!user) {
+			throw new NotFoundException(Errors.USER_NOT_FOUND)
+		};
+		return user;
 	}
-
 }

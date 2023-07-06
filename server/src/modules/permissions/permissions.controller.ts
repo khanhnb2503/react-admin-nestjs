@@ -4,18 +4,21 @@ import {Response as Res} from 'express';
 
 import {PermissionsService} from './permissions.service';
 import {CreatePermissionDto} from './dto/create-permission.dto';
-import {UpdatePermissionDto} from './dto/update-permission.dto';
 import {AccessTokenGuard} from 'src/guards/access-token.guard';
 import {User, RequestUser} from 'src/decorators/user.decorator';
+import { RolesGuard } from 'src/guards/roles.guard'; 
+import { Roles } from 'src/decorators/role.decorator';
+import { Role } from 'src/roles/app.role';
 
 @ApiTags('Permissions')
-@Controller('permissions')
+@Controller('api/permissions')
 @ApiBearerAuth()
+@UseGuards(AccessTokenGuard, )
 export class PermissionsController {
 	constructor(private readonly permissionsService: PermissionsService) { }
 
 	@Post()
-	@UseGuards(AccessTokenGuard)
+	// @Roles(Role.ADMIN)
 	create(
 		@Body() createPermissionDto: CreatePermissionDto,
 		@User() user: RequestUser
@@ -38,11 +41,13 @@ export class PermissionsController {
 	}
 
 	@Put(':id')
+	// @Roles(Role.ADMIN)
 	update(@Param('id') id: string, @Body() updatePermissionDto: CreatePermissionDto) {
 		return this.permissionsService.update(id, updatePermissionDto);
 	}
 
 	@Delete(':id')
+	// @Roles(Role.ADMIN)
 	remove(@Param('id') id: string) {
 		return this.permissionsService.remove(id);
 	}

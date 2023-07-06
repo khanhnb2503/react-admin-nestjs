@@ -9,7 +9,7 @@ export class PermissionName {
 	@ApiProperty({
     description: 'Id permission',
   })
-  permissionId: string;
+  id: string;
 
 	@ApiProperty({
     description: 'Tên permission',
@@ -21,7 +21,7 @@ export class PermissionId {
 	@ApiProperty({
     description: 'Id permission',
   })
-  permissionId: string;
+  id: string;
 }
 
 @Collection('groups')

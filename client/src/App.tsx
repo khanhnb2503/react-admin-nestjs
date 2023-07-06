@@ -8,7 +8,6 @@ import 'bootstrap/dist/css/bootstrap.css';
 import {authProvider} from './authProvider';
 import {dataProvider} from './data/dataProvider';
 import {MyLayout} from './components/MyComponents';
-import users from './resources/users';
 
 import {UserList} from './resources/users/UserList';
 import {UserDetail} from './resources/users/UserDetail';
@@ -17,9 +16,12 @@ import {EditUser} from './resources/users/UserEdit';
 
 import {PermissionList} from './resources/permissions/PermissionList';
 import {PermissionEdit} from './resources/permissions/PermissionEdit';
+import {PermissionCreate} from './resources/permissions/PermissionCreate';
 
 import { GroupList } from './resources/groups/GroupList';
 import { GroupDetail } from './resources/groups/GroupDetail';
+import { GroupCreate } from './resources/groups/GroupCreate';
+import { GroupEdit } from './resources/groups/GroupEdit';
 import Login from './page/auth/Login';
 import DashBoard from './components/Dashboard';
 
@@ -44,13 +46,16 @@ export const App = () => (
 				name="permissions"
 				list={PermissionList}
 				edit={PermissionEdit}
+				create={PermissionCreate}
 				icon={VerifiedUserIcon}
 			/>
 
 			<Resource
 				name="groups"
 				list={GroupList}
+				create={GroupCreate}
 				show={GroupDetail}
+				edit={GroupEdit}
 				icon={Diversity3Icon}
 			/>
 		</Admin>

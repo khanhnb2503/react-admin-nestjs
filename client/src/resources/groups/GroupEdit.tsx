@@ -1,15 +1,15 @@
 import { Edit, TextInput, SimpleForm } from "react-admin";
 import { FormValidators } from '../../constants/errors';
 
-export const PermissionEdit = () => {
+export const GroupEdit = () => {
 	return (
 		<Edit>
 			<SimpleForm>
 				<TextInput 
-					label="Permission name"
+					label="Group name"
 					variant="outlined" 
 					source="name" 
-					validate={FormValidators.permission}
+					validate={FormValidators.groups}
 				/>
 			</SimpleForm>
 		</Edit>

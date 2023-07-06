@@ -1,13 +1,13 @@
 import {ConflictException, Inject, Injectable, NotFoundException, forwardRef} from '@nestjs/common';
 import {InjectRepository} from 'nestjs-fireorm';
-import {BaseFirestoreRepository, createBatch} from 'fireorm';
+import {BaseFirestoreRepository} from 'fireorm';
 
 import {GroupEntity} from './entities/group.entity';
 import {CreateGroupDto} from './dto/create-group.dto';
 import {UpdateGroupDto} from './dto/update-group.dto';
 import {RequestUser} from 'src/decorators/user.decorator';
 import { PermissionsService } from '../permissions/permissions.service'; 
-import {PermissionId} from './entities/group.entity';
+import { Errors } from 'src/constants/errors';
 
 @Injectable()
 export class GroupsService {
@@ -20,9 +20,7 @@ export class GroupsService {
 	async create(groupDto: CreateGroupDto, user: RequestUser): Promise<GroupEntity> {
 		const checkExistGroupName = await this.checkExistGroupName(groupDto.name);
 		if(checkExistGroupName) {
-			throw new ConflictException({
-				message: "Group name đã tồn tại"
-			})
+			throw new ConflictException(Errors.GROUP_EXIST)
 		};
 
 		const createGroup = await this.repoGroup.create({
@@ -31,9 +29,7 @@ export class GroupsService {
 		});
 
 		if (!createGroup.id) {
-			throw new ConflictException({
-				message: 'Lỗi khi tạo groups'
-			})
+			throw new ConflictException(Errors.GROUP_CONFLICT)
 		};
 
 		return createGroup;
@@ -46,20 +42,19 @@ export class GroupsService {
 	async findOne(id: string): Promise<GroupEntity> {
 		const group = await this.findByIdGroup(id);
 		if (!group) {
-			throw new NotFoundException({
-				message: 'Group id không tồn tại'
-			})
+			throw new NotFoundException(Errors.GROUP_NOT_FOUND)
 		};
-
 		return group;
 	}
 
 	async update(id: string, groupDto: UpdateGroupDto) {
 		const group = await this.findByIdGroup(id);
 		if (!group) {
-			throw new NotFoundException({
-				message: 'Group id không tồn tại'
-			})
+			throw new NotFoundException(Errors.GROUP_NOT_FOUND)
+		};
+		const checkExistGroupName = await this.checkExistGroupName(groupDto.name);
+		if(checkExistGroupName) {
+			throw new ConflictException()
 		};
 
 		group.name = groupDto.name;
@@ -71,9 +66,7 @@ export class GroupsService {
 	async remove(id: string) {
 		const group = await this.findByIdGroup(id);
 		if (!group) {
-			throw new NotFoundException({
-				message: 'Group id không tồn tại'
-			})
+			throw new NotFoundException(Errors.GROUP_NOT_FOUND)
 		};
 
 		return this.repoGroup.delete(id);
@@ -81,62 +74,54 @@ export class GroupsService {
 
 	async addPermission(
 		id: string,
-		permissId: PermissionId
+		permissId: any
 	): Promise<GroupEntity> {
 		const groups = await this.findByIdGroup(id);
+		const permissions = await this.permissionsService.findAll();
 		if (!groups) {
-			throw new NotFoundException({
-				message: 'Group id không tồn tại'
-			})
+			throw new NotFoundException(Errors.GROUP_NOT_FOUND)
 		};
 
-		const { permissionId } = permissId;
+		if (permissId.length < 0) {
+      throw new NotFoundException(Errors.GROUP_EMPTY)
+    };
 
-		const permissions = await this.permissionsService.findOne(permissionId);
-		const permissionData = [{
-			permissionId,
-			name: permissions.name
-		}];
+		const mapPermissIdRequest = new Map(permissId.map((id) => [id, id]));
+		const filterPermission = permissions.filter((item) => 
+			item.id === mapPermissIdRequest.get(item.id));
+		let roles = [];
+		filterPermission.forEach((item) => roles.push({id: item.id,name: item.name}));
 
 		if (!groups.roles?.length) {
-			groups.roles = permissionData;
+			groups.roles = roles;
 			return this.repoGroup.update(groups);
-		};
+		}
 
-		const groupMap = new Map(groups.roles.map((group) => [group.permissionId, group]));
-		if (groupMap.has(permissionId)) {
-			throw new ConflictException({
-				message: "Quyền đã tồn tại"
-			})
-		};
-
-		groups.roles.push(...permissionData);
+		groups.roles.push(...roles);
 		return this.repoGroup.update(groups)
 	};
 
 	async unPermission(
 		id: string,
-		permissId: PermissionId
+		permissId: any
 	): Promise<GroupEntity> {
 		const groups = await this.findByIdGroup(id);
 		if (!groups) {
-			throw new NotFoundException({
-				message: 'Group id không tồn tại'
-			})
+			throw new NotFoundException(Errors.GROUP_NOT_FOUND)
 		};
-		const { permissionId } = permissId;
 
 		if (groups.roles.length > 0) {
-			const filterRoles = groups.roles.filter(
-				(role) => role.permissionId !== permissionId
-			);
-			groups.roles = filterRoles;
+			const filterRole = groups.roles.filter((role) => !permissId.includes(role.id));
+			groups.roles = filterRole;
 			return this.repoGroup.update(groups);
 		}
+		return;
 	}
 
 	private async checkExistGroupName(name: string) {
-		const permissions = await this.repoGroup.whereEqualTo('name', name);
+		const permissions = await this.repoGroup
+			.whereEqualTo('name', name)
+			.findOne();
 		return permissions;
 	};
 

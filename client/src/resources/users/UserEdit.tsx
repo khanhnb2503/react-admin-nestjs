@@ -1,4 +1,11 @@
-import { Edit, TextInput, SimpleForm, useGetList, SelectInput, ReferenceInput } from "react-admin";
+import { 
+	Edit, 
+	TextInput, 
+	SimpleForm, 
+	useGetList, 
+	SelectInput, 
+	ReferenceInput 
+} from "react-admin";
 import { FormValidators } from '../../constants/errors';
 
 export const EditUser = () => {
