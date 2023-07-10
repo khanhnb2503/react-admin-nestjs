@@ -4,6 +4,7 @@ import { baseUrl } from '../../constants/baseurl';
 import axios from 'axios';
 
 import {IUserLogin} from "../../interfaces/user.login";
+import instance from '../../common/http-common';
 const { Title, Text } = Typography;
 
 const Login = () => {
@@ -12,7 +13,7 @@ const Login = () => {
 	const [api, contextHolder] = notification.useNotification();
 
 	const handleLogin = async (users: IUserLogin) => {
-		const { data, status } = await axios.post(`${baseUrl}/auth/login`, users);
+		const { status, data } = await instance.post('/auth/login', users);
 		if(status !== 201 ) {
 			api.info({
 				message: `Notification`,

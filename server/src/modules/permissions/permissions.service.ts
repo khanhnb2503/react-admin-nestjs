@@ -56,8 +56,9 @@ export class PermissionsService {
 			throw new ConflictException(Errors.PERMISSION_EXIST)
 		};
 		
+		permission.name = permissionDto.name
 		const updatePermission = await this.repoPermission.update({
-			...permissionDto,
+			...permission,
 			updatedAt: Date.now()
 		});
 		return updatePermission;

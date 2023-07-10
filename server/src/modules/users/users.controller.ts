@@ -1,6 +1,7 @@
 import {Controller, Get, Post, Body, Param, Delete, Response, Query, Put, UseGuards} from '@nestjs/common';
 import {ApiTags, ApiBearerAuth} from '@nestjs/swagger';
 import {Response as Res} from 'express';
+import { UseRoles, UserRoles, ACGuard } from 'nest-access-control';
 
 import {UsersService} from './users.service';
 import {CreateUserDto} from './dto/create-user.dto';
@@ -9,17 +10,18 @@ import { RolesGuard } from 'src/guards/roles.guard';
 import {User, RequestUser} from 'src/decorators/user.decorator';
 import { Roles } from 'src/decorators/role.decorator';
 import { Role } from 'src/roles/app.role';
+import { AuthGuard } from 'src/guards/auth.guard';
 
 
 @ApiTags('User')
 @Controller('api/users')
 @ApiBearerAuth()
-@UseGuards(AccessTokenGuard, RolesGuard)
 export class UsersController {
 	constructor(private readonly usersService: UsersService) { }
 
-	@Post()
 	@Roles(Role.ADMIN)
+	@UseGuards(AccessTokenGuard, RolesGuard)
+	@Post()
 	async create(
 		@Body() createUserDto: CreateUserDto,
 		@User() user: RequestUser,
@@ -28,13 +30,18 @@ export class UsersController {
 	}
 
 	@Get()
+	@UseGuards(AccessTokenGuard, AuthGuard, ACGuard)
+	@UseRoles({
+		resource: 'users',
+		action: 'read',
+	})
 	async findAll(
 		@Response() res: Res,
 		@Query() query: any,
 		@User() user: RequestUser,
+		@UserRoles() userRoles: any
 	) {
-
-		const users = await this.usersService.findAll(query);
+		const users = await this.usersService.findAll(query, userRoles);
 		return res.set({
 			'Access-Control-Expose-Headers': 'Content-Range',
 			'Content-Range': '0-5/40'
@@ -42,11 +49,14 @@ export class UsersController {
 	}
 
 	@Get(':id')
+	@UseGuards(AccessTokenGuard, RolesGuard)
 	findOne(@Param('id') id: string) {
 		return this.usersService.findOne(id);
 	}
-	@Put(':id')
+
 	@Roles(Role.ADMIN)
+	@UseGuards(AccessTokenGuard, RolesGuard)
+	@Put(':id')
 	update(
 		@Param('id',) id: string,
 		@Body() updateUserDto: any,
@@ -55,8 +65,9 @@ export class UsersController {
 		return this.usersService.update(id, updateUserDto, user);
 	}
 
-	@Delete(':id')
 	@Roles(Role.ADMIN)
+	@UseGuards(AccessTokenGuard, RolesGuard)
+	@Delete(':id')
 	remove(
 		@Param('id') id: string,
 		@User() user: RequestUser

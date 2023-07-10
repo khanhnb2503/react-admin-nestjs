@@ -43,7 +43,8 @@ export class UsersService {
 		return createUser;
 	}
 
-	async findAll(query: any,): Promise<UserResponse[]> {
+	async findAll(query: any, userRoles: any): Promise<UserResponse[]> {
+		
 		const page = JSON.parse(query.range);
 		const filterName = JSON.parse(query.filter);
 
@@ -117,6 +118,14 @@ export class UsersService {
 			throw new NotFoundException(Errors.GROUP_NOT_FOUND)
 		};
 		return groups;
+	}
+
+	async findByUserToGroup(id: string) {
+		const user = await this.findByUserId(id);
+		if(user) {
+			const groups = await this.groupService.findOne(user.roleId);
+			return groups;
+		}
 	}
 
 	private async findByUserId(id: string) {

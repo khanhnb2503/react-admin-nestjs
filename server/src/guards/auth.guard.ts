@@ -1,14 +1,17 @@
 import {Injectable, CanActivate, ExecutionContext} from '@nestjs/common';
+import { UsersService } from 'src/modules/users/users.service';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
-	canActivate(context: ExecutionContext): boolean | Promise<boolean> {
+	constructor(
+		private readonly usersService: UsersService,
+	) {}
+	async canActivate(context: ExecutionContext): Promise<boolean> {
 		const req = context.switchToHttp().getRequest();
-		const fakeUser = {
-			roles: ['ADMIN_UPDATE_OWN_VIDEO', 'USER_CREATE_ANY_VIDEO'],
-			username: '@fake',
-		};
-		req.user = fakeUser;
+		const groupName = await this.usersService.findByUserToGroup(req.user.sub);
+		req.user = {
+			roles: [groupName.name],
+		}
 		return true;
 	}
 }
