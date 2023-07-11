@@ -6,12 +6,14 @@ import { GroupsModule } from '../groups/groups.module';
 
 @Module({
   imports: [
-    GroupsModule,
     AccessControlModule.forRootAsync({
+      imports: [GroupsModule],
       inject: [GroupsService],
-      useFactory: async (groupsService: GroupsService) => {
+      useFactory: async (groupsService: GroupsService): Promise<RolesBuilder> => {
         const groups = await groupsService.findAll();
-        return new RolesBuilder([...groups])
+        return new RolesBuilder([
+          { role: 'admin', resource: 'users', action: 'read' }
+        ]);
       }
     })
   ],
@@ -19,4 +21,4 @@ import { GroupsModule } from '../groups/groups.module';
   exports: []
 })
 
-export class AccesscontrolModule  {}
+export class RolesModule { }

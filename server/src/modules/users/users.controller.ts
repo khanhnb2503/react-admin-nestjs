@@ -1,15 +1,13 @@
 import {Controller, Get, Post, Body, Param, Delete, Response, Query, Put, UseGuards} from '@nestjs/common';
 import {ApiTags, ApiBearerAuth} from '@nestjs/swagger';
 import {Response as Res} from 'express';
-import { UseRoles, UserRoles, ACGuard } from 'nest-access-control';
+import { UseRoles, ACGuard } from 'nest-access-control';
 
 import {UsersService} from './users.service';
 import {CreateUserDto} from './dto/create-user.dto';
 import {AccessTokenGuard} from 'src/guards/access-token.guard';
 import { RolesGuard } from 'src/guards/roles.guard'; 
 import {User, RequestUser} from 'src/decorators/user.decorator';
-import { Roles } from 'src/decorators/role.decorator';
-import { Role } from 'src/roles/app.role';
 import { AuthGuard } from 'src/guards/auth.guard';
 
 
@@ -19,8 +17,11 @@ import { AuthGuard } from 'src/guards/auth.guard';
 export class UsersController {
 	constructor(private readonly usersService: UsersService) { }
 
-	@Roles(Role.ADMIN)
-	@UseGuards(AccessTokenGuard, RolesGuard)
+	@UseGuards(AccessTokenGuard, AuthGuard, ACGuard)
+	@UseRoles({
+		resource: 'users',
+		action: 'create',
+	})
 	@Post()
 	async create(
 		@Body() createUserDto: CreateUserDto,
@@ -29,33 +30,40 @@ export class UsersController {
 		return this.usersService.create(createUserDto, user);
 	}
 
-	@Get()
 	@UseGuards(AccessTokenGuard, AuthGuard, ACGuard)
 	@UseRoles({
 		resource: 'users',
 		action: 'read',
 	})
+	@Get()
 	async findAll(
 		@Response() res: Res,
 		@Query() query: any,
-		@User() user: RequestUser,
-		@UserRoles() userRoles: any
+		@User() user: RequestUser
 	) {
-		const users = await this.usersService.findAll(query, userRoles);
+		const users = await this.usersService.findAll(query);
 		return res.set({
 			'Access-Control-Expose-Headers': 'Content-Range',
 			'Content-Range': '0-5/40'
 		}).json(users);
 	}
 
+	@UseGuards(AccessTokenGuard, AuthGuard, ACGuard)
+	@UseRoles({
+		resource: 'users',
+		action: 'create',
+	})
 	@Get(':id')
 	@UseGuards(AccessTokenGuard, RolesGuard)
 	findOne(@Param('id') id: string) {
 		return this.usersService.findOne(id);
 	}
 
-	@Roles(Role.ADMIN)
-	@UseGuards(AccessTokenGuard, RolesGuard)
+	@UseGuards(AccessTokenGuard, AuthGuard, ACGuard)
+	@UseRoles({
+		resource: 'users',
+		action: 'update',
+	})
 	@Put(':id')
 	update(
 		@Param('id',) id: string,
@@ -65,8 +73,11 @@ export class UsersController {
 		return this.usersService.update(id, updateUserDto, user);
 	}
 
-	@Roles(Role.ADMIN)
-	@UseGuards(AccessTokenGuard, RolesGuard)
+	@UseGuards(AccessTokenGuard, AuthGuard, ACGuard)
+	@UseRoles({
+		resource: 'users',
+		action: 'delete',
+	})
 	@Delete(':id')
 	remove(
 		@Param('id') id: string,

@@ -3,16 +3,17 @@ import {
 	Injectable,
 	NotFoundException
 } from '@nestjs/common';
-import {InjectRepository} from 'nestjs-fireorm';
-import {BaseFirestoreRepository} from 'fireorm';
+import { InjectRepository } from 'nestjs-fireorm';
+import { BaseFirestoreRepository } from 'fireorm';
 import * as bcrypt from 'bcrypt';
 
-import {UserEntity} from './entities/user.entity';
-import {CreateUserDto} from './dto/create-user.dto';
-import {UserResponse} from './dto/user.response';
-import {RequestUser} from 'src/decorators/user.decorator';
+import { UserEntity } from './entities/user.entity';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UserResponse } from './dto/user.response';
+import { RequestUser } from 'src/decorators/user.decorator';
 import { GroupsService } from '../groups/groups.service';
 import { Errors } from 'src/constants/errors';
+import { RolesBuilder, AccessControlModule } from 'nest-access-control';
 
 @Injectable()
 export class UsersService {
@@ -43,8 +44,57 @@ export class UsersService {
 		return createUser;
 	}
 
-	async findAll(query: any, userRoles: any): Promise<UserResponse[]> {
-		
+	async findAll(query: any): Promise<UserResponse[]> {
+		let roles = [
+			{
+				name: 'admin',
+				grants: [
+					{
+						permission: {
+							resource: 'users',
+							action: 'create'
+						}
+					},
+					{
+						permission: {
+							resource: 'post',
+							action: 'update'
+						}
+					}
+				]
+			},
+			{
+				name: 'member',
+				grants: [
+					{
+						permission: {
+							resource: 'users',
+							action: 'delete'
+						}
+					},
+					{
+						permission: {
+							resource: 'post',
+							action: 'create'
+						}
+					}
+				]
+			}
+		];
+
+		let results = roles.map((role) => {
+			return role.grants.map((grant) => {
+				let { resource, action } = grant.permission;
+				return {role: role.name,resource,action}
+			})
+		});
+		if(results) {
+			let grants = [];
+			results.forEach((grant) => grants = grants.concat(grant));
+			console.log(grants);	
+			const arr = new RolesBuilder(grants);
+			// console.log(arr);
+		}
 		const page = JSON.parse(query.range);
 		const filterName = JSON.parse(query.filter);
 
@@ -114,7 +164,7 @@ export class UsersService {
 
 	async findGroupName(id: string) {
 		const groups = await this.groupService.findOne(id);
-		if(!groups) {
+		if (!groups) {
 			throw new NotFoundException(Errors.GROUP_NOT_FOUND)
 		};
 		return groups;
@@ -122,8 +172,8 @@ export class UsersService {
 
 	async findByUserToGroup(id: string) {
 		const user = await this.findByUserId(id);
-		if(user) {
-			const groups = await this.groupService.findOne(user.roleId);
+		if (user) {
+			const groups = await this.groupService.findOne(user?.roleId);
 			return groups;
 		}
 	}

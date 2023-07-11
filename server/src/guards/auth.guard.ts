@@ -11,7 +11,7 @@ export class AuthGuard implements CanActivate {
 		const groupName = await this.usersService.findByUserToGroup(req.user.sub);
 		req.user = {
 			roles: [groupName.name],
-		}
+		};
 		return true;
 	}
 }
