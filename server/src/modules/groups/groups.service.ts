@@ -1,13 +1,14 @@
-import {ConflictException, Inject, Injectable, NotFoundException, forwardRef} from '@nestjs/common';
-import {InjectRepository} from 'nestjs-fireorm';
-import {BaseFirestoreRepository} from 'fireorm';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from 'nestjs-fireorm';
+import { BaseFirestoreRepository } from 'fireorm';
 
-import {GroupEntity} from './entities/group.entity';
-import {CreateGroupDto} from './dto/create-group.dto';
-import {UpdateGroupDto} from './dto/update-group.dto';
-import {RequestUser} from 'src/decorators/user.decorator';
-import { PermissionsService } from '../permissions/permissions.service'; 
+import { GroupEntity } from './entities/group.entity';
+import { CreateGroupDto } from './dto/create-group.dto';
+import { UpdateGroupDto } from './dto/update-group.dto';
+import { RequestUser } from 'src/decorators/user.decorator';
+import { PermissionsService } from '../permissions/permissions.service';
 import { Errors } from 'src/constants/errors';
+import { RolesBuilder } from 'nest-access-control';
 
 @Injectable()
 export class GroupsService {
@@ -19,7 +20,7 @@ export class GroupsService {
 
 	async create(groupDto: CreateGroupDto, user: RequestUser): Promise<GroupEntity> {
 		const checkExistGroupName = await this.checkExistGroupName(groupDto.name);
-		if(checkExistGroupName) {
+		if (checkExistGroupName) {
 			throw new ConflictException(Errors.GROUP_EXIST)
 		};
 
@@ -36,7 +37,25 @@ export class GroupsService {
 	};
 
 	async findAll(): Promise<GroupEntity[]> {
-		return this.repoGroup.find();
+		const groups = await this.repoGroup.find();
+		let permissions = groups.map((group) => {
+			return group?.roles?.map((role) =>  {
+				return {
+          role: group.name,
+          resource: role.resource,
+          action: role.action,
+        }
+			})
+		});
+		
+		if (permissions) {
+			let grants = [];
+			permissions.forEach((grant) => {
+				if(grant) return grants = grants.concat(grant)
+			});
+			console.log(grants);
+		};
+		return groups;
 	}
 
 	async findOne(id: string): Promise<GroupEntity> {
@@ -53,7 +72,7 @@ export class GroupsService {
 			throw new NotFoundException(Errors.GROUP_NOT_FOUND)
 		};
 		const checkExistGroupName = await this.checkExistGroupName(groupDto.name);
-		if(checkExistGroupName) {
+		if (checkExistGroupName) {
 			throw new ConflictException()
 		};
 
@@ -83,14 +102,16 @@ export class GroupsService {
 		};
 
 		if (permissId.length < 0) {
-      throw new NotFoundException(Errors.GROUP_EMPTY)
-    };
+			throw new NotFoundException(Errors.GROUP_EMPTY)
+		};
 
 		const mapPermissIdRequest = new Map(permissId.map((id) => [id, id]));
-		const filterPermission = permissions.filter((item) => 
+		const filterPermission = permissions.filter((item) =>
 			item.id === mapPermissIdRequest.get(item.id));
 		let roles = [];
-		filterPermission.forEach((item) => roles.push({id: item.id,name: item.name}));
+		filterPermission.forEach((item) => roles.push(
+			{ id: item.id, action: item.name, resource: 'users' })
+		);
 
 		if (!groups.roles?.length) {
 			groups.roles = roles;

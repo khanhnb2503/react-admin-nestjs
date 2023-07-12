@@ -13,9 +13,15 @@ import { groupsApi } from '../../services/groups';
 import { permissionApi } from '../../services/permission';
 
 const columns: GridColDef[] = [
-	{ field: 'id', headerName: 'ID', width: 300 },
-	{ field: 'name', headerName: 'PermissionName', width: 300 },
+	{ field: 'id', headerName: 'ID', width: 250 },
+	{ field: 'action', headerName: 'Permission', width: 300 },
+	{ field: 'resource', headerName: 'Resource', width: 200 },
 ];
+
+const columnModal: GridColDef[] = [
+	{ field: 'id', headerName: 'ID', width: 250 },
+  { field: 'name', headerName: 'Permission', width: 300 },
+]
 
 export const GroupDetail = () => {
 	const { id } = useParams();
@@ -117,7 +123,7 @@ export const GroupDetail = () => {
 					<div>
 						<DataGrid
 							rows={permission}
-							columns={columns}
+							columns={columnModal}
 							autoHeight={true}
 							checkboxSelection
 							disableRowSelectionOnClick={false}

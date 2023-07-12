@@ -12,6 +12,7 @@ import {GroupEntity} from './entities/group.entity';
 import { RolesGuard } from 'src/guards/roles.guard'; 
 import { Roles } from 'src/decorators/role.decorator';
 import { Role } from 'src/roles/app.role';
+import { GrantPermission } from './entities/group.entity'; 
 
 
 @ApiTags('Groups')
@@ -76,7 +77,7 @@ export class GroupsController {
 	@ApiOperation({
 		description: 'Thêm quyền vào groups',
 	})
-	@ApiBody({ type: PermissionId })
+	@ApiBody({ type: GrantPermission })
 	addPermissionToGroup(
 		@Param('id') id: string,
 		@Body() permissionId: any, 

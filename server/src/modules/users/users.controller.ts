@@ -20,7 +20,7 @@ export class UsersController {
 	@UseGuards(AccessTokenGuard, AuthGuard, ACGuard)
 	@UseRoles({
 		resource: 'users',
-		action: 'create',
+		action: 'create'
 	})
 	@Post()
 	async create(
@@ -51,15 +51,14 @@ export class UsersController {
 	@UseGuards(AccessTokenGuard, AuthGuard, ACGuard)
 	@UseRoles({
 		resource: 'users',
-		action: 'create',
+		action: 'read',
 	})
 	@Get(':id')
-	@UseGuards(AccessTokenGuard, RolesGuard)
 	findOne(@Param('id') id: string) {
 		return this.usersService.findOne(id);
 	}
 
-	@UseGuards(AccessTokenGuard, AuthGuard, ACGuard)
+	@UseGuards(AccessTokenGuard)
 	@UseRoles({
 		resource: 'users',
 		action: 'update',
@@ -74,10 +73,10 @@ export class UsersController {
 	}
 
 	@UseGuards(AccessTokenGuard, AuthGuard, ACGuard)
-	@UseRoles({
-		resource: 'users',
-		action: 'delete',
-	})
+	// @UseRoles({
+	// 	resource: 'users',
+	// 	action: 'delete',
+	// })
 	@Delete(':id')
 	remove(
 		@Param('id') id: string,

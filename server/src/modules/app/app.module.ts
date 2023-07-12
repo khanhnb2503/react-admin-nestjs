@@ -4,6 +4,8 @@ import { join } from 'path';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { LoggerModule } from 'nestjs-pino';
 import { FireormModule } from 'nestjs-fireorm';
+import { APP_GUARD } from '@nestjs/core';
+import { AuthGuard } from 'src/guards/auth.guard';
 
 import { UsersModule } from '../users/users.module';
 import { AuthModule } from '../auth/auth.module';
@@ -14,11 +16,11 @@ import { AppService } from './app.service';
 import { GroupsModule } from '../groups/groups.module';
 import { PermissionsModule } from '../permissions/permissions.module';
 import { RolesModule } from '../roles/role.module';
-import { roles } from 'src/roles/app.role';
+import { AccessTokenGuard } from 'src/guards/access-token.guard';
 @Module({
   imports: [
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', '..', '..', 'public'),
+      rootPath: join(__dirname, '..', '..', '..', 'public')
     }),
     ConfigModule.forRoot({
       isGlobal: true,
@@ -54,11 +56,11 @@ import { roles } from 'src/roles/app.role';
     UsersModule,
     AuthModule,
 		GroupsModule,
-		PermissionsModule,
+		PermissionsModule
   ],
   controllers: [AppController],
   providers: [
-		AppService,
+		AppService
 	],
 })
 export class AppModule {}

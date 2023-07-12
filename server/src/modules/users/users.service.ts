@@ -45,56 +45,6 @@ export class UsersService {
 	}
 
 	async findAll(query: any): Promise<UserResponse[]> {
-		let roles = [
-			{
-				name: 'admin',
-				grants: [
-					{
-						permission: {
-							resource: 'users',
-							action: 'create'
-						}
-					},
-					{
-						permission: {
-							resource: 'post',
-							action: 'update'
-						}
-					}
-				]
-			},
-			{
-				name: 'member',
-				grants: [
-					{
-						permission: {
-							resource: 'users',
-							action: 'delete'
-						}
-					},
-					{
-						permission: {
-							resource: 'post',
-							action: 'create'
-						}
-					}
-				]
-			}
-		];
-
-		let results = roles.map((role) => {
-			return role.grants.map((grant) => {
-				let { resource, action } = grant.permission;
-				return {role: role.name,resource,action}
-			})
-		});
-		if(results) {
-			let grants = [];
-			results.forEach((grant) => grants = grants.concat(grant));
-			console.log(grants);	
-			const arr = new RolesBuilder(grants);
-			// console.log(arr);
-		}
 		const page = JSON.parse(query.range);
 		const filterName = JSON.parse(query.filter);
 

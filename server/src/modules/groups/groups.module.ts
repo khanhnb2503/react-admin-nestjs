@@ -11,7 +11,7 @@ import { PermissionsModule } from '../permissions/permissions.module';
 	imports: [
 		FireormModule.forFeature([GroupEntity]),
 		forwardRef(() => UsersModule),
-		PermissionsModule
+		PermissionsModule,
 	],
   controllers: [GroupsController],
   providers: [GroupsService],
