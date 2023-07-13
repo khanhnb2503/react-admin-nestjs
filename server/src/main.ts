@@ -1,6 +1,8 @@
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import * as admin from 'firebase-admin';
+import { ServiceAccount } from 'firebase-admin';
 
 import { AppModule } from './modules/app/app.module';
 import { ValidationPipe } from '@nestjs/common';
@@ -17,6 +19,18 @@ const validationPipeOptions = {
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {cors: true});
   const configService = app.get(ConfigService);
+
+  const adminConfig: ServiceAccount = {
+    projectId: configService.get<string>('firebase.projectId'),
+    privateKey: configService
+      .get<string>('firebase.privateKey')
+      .replace(/\\n/g, '\n'),
+    clientEmail: configService.get<string>('firebase.clientEmail'),
+  };
+
+  admin.initializeApp({
+    credential: admin.credential.cert(adminConfig),
+  });
 
 	app.setGlobalPrefix(configService.get('service.baseUrl'));
 	app.useGlobalPipes(new ValidationPipe(validationPipeOptions));

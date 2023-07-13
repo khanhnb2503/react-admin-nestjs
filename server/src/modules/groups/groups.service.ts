@@ -8,8 +8,6 @@ import { UpdateGroupDto } from './dto/update-group.dto';
 import { RequestUser } from 'src/decorators/user.decorator';
 import { PermissionsService } from '../permissions/permissions.service';
 import { Errors } from 'src/constants/errors';
-import { RolesBuilder } from 'nest-access-control';
-
 @Injectable()
 export class GroupsService {
 	constructor(
@@ -38,23 +36,6 @@ export class GroupsService {
 
 	async findAll(): Promise<GroupEntity[]> {
 		const groups = await this.repoGroup.find();
-		let permissions = groups.map((group) => {
-			return group?.roles?.map((role) =>  {
-				return {
-          role: group.name,
-          resource: role.resource,
-          action: role.action,
-        }
-			})
-		});
-		
-		if (permissions) {
-			let grants = [];
-			permissions.forEach((grant) => {
-				if(grant) return grants = grants.concat(grant)
-			});
-			console.log(grants);
-		};
 		return groups;
 	}
 

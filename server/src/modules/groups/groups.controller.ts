@@ -9,21 +9,17 @@ import {AccessTokenGuard} from 'src/guards/access-token.guard';
 import {User, RequestUser} from 'src/decorators/user.decorator';
 import {PermissionId} from './entities/group.entity';
 import {GroupEntity} from './entities/group.entity';
-import { RolesGuard } from 'src/guards/roles.guard'; 
-import { Roles } from 'src/decorators/role.decorator';
-import { Role } from 'src/roles/app.role';
 import { GrantPermission } from './entities/group.entity'; 
 
 
 @ApiTags('Groups')
 @Controller('api/groups')
-@UseGuards(AccessTokenGuard, RolesGuard)
+@UseGuards(AccessTokenGuard)
 @ApiBearerAuth()
 export class GroupsController {
 	constructor(private readonly groupsService: GroupsService) { }
 
 	@Post()
-	@Roles(Role.ADMIN)
 	@ApiOperation({
 		description: 'Tạo groups',
 	})
@@ -55,7 +51,6 @@ export class GroupsController {
 	}
 
 	@Put(':id')
-	@Roles(Role.ADMIN)
 	@ApiOperation({
 		description: 'Cập nhật groups',
 	})
@@ -64,7 +59,6 @@ export class GroupsController {
 	}
 
 	@Delete(':id')
-	@Roles(Role.ADMIN)
 	@ApiOperation({
 		description: 'Xóa 1 groups',
 	})
@@ -73,7 +67,6 @@ export class GroupsController {
 	}
 
 	@Post('add-permission/:id')
-	@Roles(Role.ADMIN)
 	@ApiOperation({
 		description: 'Thêm quyền vào groups',
 	})
@@ -86,7 +79,6 @@ export class GroupsController {
 	};
 
 	@Post('un-permission/:id')
-	@Roles(Role.ADMIN)
 	@ApiOperation({
 		description: 'Xóa quyền khỏi groups',
 	})

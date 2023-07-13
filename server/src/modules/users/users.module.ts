@@ -5,6 +5,7 @@ import { UserEntity } from './entities/user.entity';
 import { UsersService } from './users.service';
 import { UsersController } from './users.controller';
 import { GroupsModule } from '../groups/groups.module';
+import { FirestoreService } from 'src/firestore.service';
 
 @Module({
 	imports: [

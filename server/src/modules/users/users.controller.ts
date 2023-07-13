@@ -6,7 +6,6 @@ import { UseRoles, ACGuard } from 'nest-access-control';
 import {UsersService} from './users.service';
 import {CreateUserDto} from './dto/create-user.dto';
 import {AccessTokenGuard} from 'src/guards/access-token.guard';
-import { RolesGuard } from 'src/guards/roles.guard'; 
 import {User, RequestUser} from 'src/decorators/user.decorator';
 import { AuthGuard } from 'src/guards/auth.guard';
 
@@ -20,7 +19,7 @@ export class UsersController {
 	@UseGuards(AccessTokenGuard, AuthGuard, ACGuard)
 	@UseRoles({
 		resource: 'users',
-		action: 'create'
+		action: 'create',
 	})
 	@Post()
 	async create(
