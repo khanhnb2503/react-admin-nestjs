@@ -64,8 +64,11 @@ export const GroupDetail = () => {
 	}, []);
 
 	return (
-		<div>
-			{isSuccess && (
+		<div className='wrapper__group'>
+			<div className="content">
+				
+			</div>
+			{/* {isSuccess && (
 				<Card sx={{ maxWidth: 900, padding: 3 }}>
 					<div>
 						<p>GROUP NAME: {groups?.name}</p>
@@ -148,7 +151,7 @@ export const GroupDetail = () => {
 						</Button>
 					)}
 				</Form>
-			</Modal>
+			</Modal> */}
 		</div>
 	)
 }

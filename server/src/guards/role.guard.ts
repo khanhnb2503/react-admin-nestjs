@@ -28,7 +28,8 @@ export class RolesGuard implements CanActivate {
 
       if(checkExistRole) {
         throw new ForbiddenException(Errors.ROLE_FORBIDDEN)
-      }
+      };
+      
       return true;
     };
   }
