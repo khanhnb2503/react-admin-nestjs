@@ -1,7 +1,6 @@
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import * as admin from 'firebase-admin';
 import { ServiceAccount } from 'firebase-admin';
 
 import { AppModule } from './modules/app/app.module';
@@ -20,14 +19,6 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
 
-  const adminConfig: ServiceAccount = {
-    projectId: configService.get<string>('firebase.projectId'),
-    privateKey: configService
-      .get<string>('firebase.privateKey')
-      .replace(/\\n/g, '\n'),
-    clientEmail: configService.get<string>('firebase.clientEmail'),
-  };
-
   app.enableCors({
     origin: 'http://localhost:5173',
     credentials: true
@@ -44,6 +35,6 @@ async function bootstrap() {
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, document);
-  await app.listen(configService.get<number>('server.port') || 4000, '0.0.0.0');
+  await app.listen(configService.get<number>('server.port') || 4000, '0.0.0.0')
 }
 bootstrap();
