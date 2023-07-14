@@ -13,8 +13,6 @@ import { UserResponse } from './dto/user.response';
 import { RequestUser } from 'src/decorators/user.decorator';
 import { GroupsService } from '../groups/groups.service';
 import { Errors } from 'src/constants/errors';
-import { RolesBuilder, AccessControlModule } from 'nest-access-control';
-
 @Injectable()
 export class UsersService {
 	constructor(
@@ -111,15 +109,7 @@ export class UsersService {
 	async findByUsername(username: string): Promise<UserEntity> {
 		return this.repoUser.whereEqualTo('username', username).findOne()
 	};
-
-	async findGroupName(id: string) {
-		const groups = await this.groupService.findOne(id);
-		if (!groups) {
-			throw new NotFoundException(Errors.GROUP_NOT_FOUND)
-		};
-		return groups;
-	}
-
+	
 	async findByUserToGroup(id: string) {
 		const user = await this.findByUserId(id);
 		if (user) {

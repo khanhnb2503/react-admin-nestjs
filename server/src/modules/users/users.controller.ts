@@ -3,24 +3,21 @@ import {ApiTags, ApiBearerAuth} from '@nestjs/swagger';
 import {Response as Res} from 'express';
 import { UseRoles, ACGuard } from 'nest-access-control';
 
+import { RequirePermission, Permissions } from 'src/decorators/role.decorator';
 import {UsersService} from './users.service';
 import {CreateUserDto} from './dto/create-user.dto';
 import {AccessTokenGuard} from 'src/guards/access-token.guard';
 import {User, RequestUser} from 'src/decorators/user.decorator';
 import { AuthGuard } from 'src/guards/auth.guard';
-
-
+import { RolesGuard } from 'src/guards/role.guard';
 @ApiTags('User')
 @Controller('api/users')
 @ApiBearerAuth()
 export class UsersController {
 	constructor(private readonly usersService: UsersService) { }
 
-	@UseGuards(AccessTokenGuard, AuthGuard, ACGuard)
-	@UseRoles({
-		resource: 'users',
-		action: 'create',
-	})
+	@RequirePermission(Permissions.CREATE)
+	@UseGuards(AccessTokenGuard, RolesGuard)
 	@Post()
 	async create(
 		@Body() createUserDto: CreateUserDto,
@@ -29,16 +26,12 @@ export class UsersController {
 		return this.usersService.create(createUserDto, user);
 	}
 
-	@UseGuards(AccessTokenGuard, AuthGuard, ACGuard)
-	@UseRoles({
-		resource: 'users',
-		action: 'read',
-	})
+	@RequirePermission(Permissions.READ)
+	@UseGuards(AccessTokenGuard, RolesGuard)
 	@Get()
 	async findAll(
 		@Response() res: Res,
 		@Query() query: any,
-		@User() user: RequestUser
 	) {
 		const users = await this.usersService.findAll(query);
 		return res.set({

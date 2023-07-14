@@ -19,7 +19,6 @@ import { RolesService } from 'src/firestore.module';
 
 @Module({
   imports: [
-    AccessControlModule.forRoles(new RolesBuilder([{ role: 'member', resource: 'users', action: 'delete' }])),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', '..', '..', 'public')
     }),

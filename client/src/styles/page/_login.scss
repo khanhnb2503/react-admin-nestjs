@@ -1,0 +1,19 @@
+.wrapper__login {
+  
+  .content-box {
+    background-color: white;
+    box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.2), 0 4px 20px 0 rgba(0, 0, 0, 0.19);
+    padding: 25px;
+    border-radius: 3px;
+    width: 25%;
+    margin-top: 10%;
+  }
+
+  .ant-form-item {
+    margin-bottom: 30px;
+  }
+
+  .ant-input {
+    border-radius: 3px;
+  }
+}

@@ -26,7 +26,7 @@ import Login from './page/auth/Login';
 import DashBoard from './components/Dashboard';
 
 export const App = () => (
-	<>
+	<div className='App'>
 		<Admin
 			dataProvider={dataProvider}
 			authProvider={authProvider}
@@ -59,6 +59,6 @@ export const App = () => (
 				icon={Diversity3Icon}
 			/>
 		</Admin>
-	</>
+	</div>
 );
 

@@ -20,7 +20,7 @@ const columns: GridColDef[] = [
 
 const columnModal: GridColDef[] = [
 	{ field: 'id', headerName: 'ID', width: 250 },
-  { field: 'name', headerName: 'Permission', width: 300 },
+	{ field: 'name', headerName: 'Permission', width: 300 },
 ]
 
 export const GroupDetail = () => {
@@ -97,7 +97,7 @@ export const GroupDetail = () => {
 								</Button>
 							</Grid>
 							<Grid item >
-								{groups?.roles &&
+								{groups?.roles && unPermissionIds.length > 0 &&
 									<Button
 										size="small"
 										color='error'
@@ -142,9 +142,11 @@ export const GroupDetail = () => {
 							}
 						/>
 					</div>
-					<Button variant="contained" color="primary" type="submit">
-						Thêm quyền
-					</Button>
+					{permissionIds.length > 0 && (
+						<Button variant="contained" color="primary" type="submit">
+							Thêm quyền
+						</Button>
+					)}
 				</Form>
 			</Modal>
 		</div>

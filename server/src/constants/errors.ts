@@ -43,6 +43,6 @@ export const Errors = {
     message: 'Quyền không tồn tại!'
   },
   ROLE_FORBIDDEN: {
-    message: 'Bạn không có quyền truy cập'
+    message: 'Bạn không có quyền!'
   }
 }

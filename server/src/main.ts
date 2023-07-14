@@ -17,7 +17,7 @@ const validationPipeOptions = {
 };
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, {cors: true});
+  const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
 
   const adminConfig: ServiceAccount = {
@@ -28,10 +28,10 @@ async function bootstrap() {
     clientEmail: configService.get<string>('firebase.clientEmail'),
   };
 
-  admin.initializeApp({
-    credential: admin.credential.cert(adminConfig),
-  });
-
+  app.enableCors({
+    origin: 'http://localhost:5173',
+    credentials: true
+  })
 	app.setGlobalPrefix(configService.get('service.baseUrl'));
 	app.useGlobalPipes(new ValidationPipe(validationPipeOptions));
 

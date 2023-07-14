@@ -19,6 +19,7 @@ import { GroupsModule } from '../groups/groups.module';
             }
           })
         });
+        
         if (permissions) {
           let grants = [];
           permissions.forEach((grant) => {
