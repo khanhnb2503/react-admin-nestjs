@@ -1,14 +1,12 @@
 import {Controller, Get, Post, Body, Param, Delete, Response, Query, Put, UseGuards} from '@nestjs/common';
 import {ApiTags, ApiBearerAuth} from '@nestjs/swagger';
 import {Response as Res} from 'express';
-import { UseRoles, ACGuard } from 'nest-access-control';
 
 import { RequirePermission, Permissions } from 'src/decorators/role.decorator';
 import {UsersService} from './users.service';
 import {CreateUserDto} from './dto/create-user.dto';
 import {AccessTokenGuard} from 'src/guards/access-token.guard';
 import {User, RequestUser} from 'src/decorators/user.decorator';
-import { AuthGuard } from 'src/guards/auth.guard';
 import { RolesGuard } from 'src/guards/role.guard';
 @ApiTags('User')
 @Controller('api/users')
@@ -40,21 +38,14 @@ export class UsersController {
 		}).json(users);
 	}
 
-	@UseGuards(AccessTokenGuard, AuthGuard, ACGuard)
-	@UseRoles({
-		resource: 'users',
-		action: 'read',
-	})
+	@RequirePermission(Permissions.READ)
+	@UseGuards(AccessTokenGuard, RolesGuard)
 	@Get(':id')
 	findOne(@Param('id') id: string) {
 		return this.usersService.findOne(id);
 	}
-
-	@UseGuards(AccessTokenGuard)
-	@UseRoles({
-		resource: 'users',
-		action: 'update',
-	})
+	@RequirePermission(Permissions.UPDATE)
+	@UseGuards(AccessTokenGuard, RolesGuard)
 	@Put(':id')
 	update(
 		@Param('id',) id: string,
@@ -64,11 +55,8 @@ export class UsersController {
 		return this.usersService.update(id, updateUserDto, user);
 	}
 
-	@UseGuards(AccessTokenGuard, AuthGuard, ACGuard)
-	// @UseRoles({
-	// 	resource: 'users',
-	// 	action: 'delete',
-	// })
+	@RequirePermission(Permissions.DELETE)
+	@UseGuards(AccessTokenGuard, RolesGuard)
 	@Delete(':id')
 	remove(
 		@Param('id') id: string,

@@ -4,7 +4,6 @@ import { join } from 'path';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { LoggerModule } from 'nestjs-pino';
 import { FireormModule } from 'nestjs-fireorm';
-import { AccessControlModule, RolesBuilder } from 'nest-access-control';
 
 import { UsersModule } from '../users/users.module';
 import { AuthModule } from '../auth/auth.module';
@@ -15,7 +14,6 @@ import { AppService } from './app.service';
 import { GroupsModule } from '../groups/groups.module';
 import { PermissionsModule } from '../permissions/permissions.module';
 import { RolesModule } from '../roles/role.module';
-import { RolesService } from 'src/firestore.module';
 
 @Module({
   imports: [
@@ -57,7 +55,6 @@ import { RolesService } from 'src/firestore.module';
     AuthModule,
 		GroupsModule,
 		PermissionsModule,
-    // RolesService
   ],
   controllers: [AppController],
   providers: [

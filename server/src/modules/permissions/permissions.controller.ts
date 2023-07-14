@@ -1,13 +1,10 @@
 import {Controller, Get, Post, Body, Put, Param, Delete, UseGuards, Response} from '@nestjs/common';
 import {ApiTags, ApiBearerAuth} from '@nestjs/swagger';
 import {Response as Res} from 'express';
-import { UseRoles, ACGuard } from 'nest-access-control';
 
 import {PermissionsService} from './permissions.service';
 import {CreatePermissionDto} from './dto/create-permission.dto';
-import {AccessTokenGuard} from 'src/guards/access-token.guard';
 import {User, RequestUser} from 'src/decorators/user.decorator';
-import { AuthGuard } from 'src/guards/auth.guard';
 @ApiTags('Permissions')
 @Controller('api/permissions')
 @ApiBearerAuth()
@@ -22,11 +19,6 @@ export class PermissionsController {
 		return this.permissionsService.create(createPermissionDto, user);
 	}
 
-	@UseGuards(AccessTokenGuard, AuthGuard, ACGuard)
-	// @UseRoles({
-	// 	resource: 'permissions',
-	// 	action: 'read',
-	// })
 	@Get()
 	async findAll(@Response() res: Res) {
 		const permissions = await this.permissionsService.findAll();
