@@ -14,10 +14,6 @@ import {UserDetail} from './resources/users/UserDetail';
 import {UserCreate} from './resources/users/UserCreate';
 import {EditUser} from './resources/users/UserEdit';
 
-import {PermissionList} from './resources/permissions/PermissionList';
-import {PermissionEdit} from './resources/permissions/PermissionEdit';
-import {PermissionCreate} from './resources/permissions/PermissionCreate';
-
 import { GroupList } from './resources/groups/GroupList';
 import { GroupDetail } from './resources/groups/GroupDetail';
 import { GroupCreate } from './resources/groups/GroupCreate';
@@ -42,14 +38,6 @@ export const App = () => (
 				edit={EditUser}
 				icon={UserIcon}
 			/>
-			<Resource
-				name="permissions"
-				list={PermissionList}
-				edit={PermissionEdit}
-				create={PermissionCreate}
-				icon={VerifiedUserIcon}
-			/>
-
 			<Resource
 				name="groups"
 				list={GroupList}

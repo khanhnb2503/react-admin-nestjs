@@ -66,7 +66,7 @@ export const GroupDetail = () => {
 	return (
 		<div className='wrapper__group'>
 			<div className="content">
-				
+				<h3>Hello</h3>
 			</div>
 			{/* {isSuccess && (
 				<Card sx={{ maxWidth: 900, padding: 3 }}>
