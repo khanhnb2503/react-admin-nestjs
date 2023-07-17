@@ -1,4 +1,4 @@
-import {Controller, Get, Post, Body, Param, Delete, Put, UseGuards, Response} from '@nestjs/common';
+import {Controller, Get, Post, Body, Param, Delete, Put, Response, UploadedFile} from '@nestjs/common';
 import {ApiTags, ApiBearerAuth, ApiOperation, ApiBody} from '@nestjs/swagger';
 import {Response as Res} from 'express';
 
@@ -10,11 +10,12 @@ import {User, RequestUser} from 'src/decorators/user.decorator';
 import {PermissionId} from './entities/group.entity';
 import {GroupEntity} from './entities/group.entity';
 import { GrantPermission } from './entities/group.entity'; 
+import { UseUploadFile } from 'src/decorators/file.decorator';
 
 
 @ApiTags('Groups')
 @Controller('api/groups')
-@UseGuards(AccessTokenGuard)
+// @UseGuards(AccessTokenGuard)
 @ApiBearerAuth()
 export class GroupsController {
 	constructor(private readonly groupsService: GroupsService) { }
@@ -88,5 +89,16 @@ export class GroupsController {
 		@Body() permissionId: any, 
 	): Promise<GroupEntity> {
 		return this.groupsService.unPermission(id, permissionId);
+	}
+
+	@ApiOperation({
+		description: 'Tải ảnh đại diện'
+	})
+	@Post('upload')
+	@UseUploadFile('avatar')
+	upload(
+		@UploadedFile() file: Express.Multer.File
+	) {
+		console.log(file)
 	}
 }
