@@ -25,6 +25,8 @@
   }
 
   .upload-avatar {
+    width: 100%;
+    height: 60%;
     padding-bottom: 15px;
 
     .ant-upload-wrapper {
@@ -56,6 +58,7 @@
     padding: 10px;
     border-radius: 5px;
     border: 1px dashed #dedede;
+    margin-bottom: 20px;
   }
 
   .list-permission {
@@ -69,5 +72,13 @@
 
   .active span {
     font-weight: 500;
+  }
+
+  .checkbox-value {
+    span {
+      text-transform: uppercase;
+      font-weight: 500;
+      font-size: 12px;
+    }
   }
 }

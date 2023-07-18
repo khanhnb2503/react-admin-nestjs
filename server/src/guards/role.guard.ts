@@ -14,7 +14,7 @@ export class RolesGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
-    const requiredRoles = this.reflector.getAllAndOverride<Permissions>('ROLES_KEY', [
+    const requiredRoles = this.reflector.getAllAndOverride<Permissions[]>('ROLES_KEY', [
       context.getHandler(),
       context.getClass(),
     ]);
@@ -22,14 +22,19 @@ export class RolesGuard implements CanActivate {
 
     if(request.user) {
       const groups = await this.usersService.findByUserToGroup(request.user.sub);
-      const checkExistRole = !groups?.roles.some(
-        (role) => requiredRoles.includes(role.action)
-      );
 
-      if(checkExistRole) {
-        throw new ForbiddenException(Errors.ROLE_FORBIDDEN)
-      };
+      if(!groups?.roles || groups?.roles?.length < 0) 
+      throw new ForbiddenException(Errors.ROLE_FORBIDDEN);
       
+      let mapGroups = new Map(groups.roles.map((item) => [item.action, item]));
+
+      requiredRoles.map((role) => {
+        const checkExistRole = mapGroups.has(role);
+        if(!checkExistRole) {
+          throw new ForbiddenException(Errors.ROLE_FORBIDDEN)
+        }
+      });
+
       return true;
     };
   }

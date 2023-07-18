@@ -1,46 +1,39 @@
-import { Form, Row, Col, Checkbox, Button, Upload, Typography, Input, Select } from 'antd';
+import { Form, Row, Col, Checkbox, Upload, Typography, Input, Select, Button, Spin, notification } from 'antd';
 import { useGetOne } from 'react-admin';
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 
-import { IPermission } from '../../interfaces/permission';
 import { IGroups } from '../../interfaces/groups';
-import { groupsApi } from '../../services/groups';
+import { IPermission } from '../../interfaces/permission';
 import { permissionApi } from '../../services/permission';
-import { data, IData, IPermissions } from '../../../data';
+import { groupsApi } from '../../services/groups';
 
 const { Dragger } = Upload;
-const { Title, Paragraph, Text } = Typography;
+const { Text } = Typography;
 
 export const GroupDetail = () => {
 	const { id } = useParams();
 	const navigate = useNavigate();
-	const [open, setOpen] = useState(false);
-	const [permission, setPermission] = useState<IPermission[]>([]);
-	const [permissionIds, setPermissionIds] = useState<IPermission[]>([]);
-	const [unPermissionIds, setUnPermissionIds] = useState<IPermission[]>([]);
+	const [api, contextHolder] = notification.useNotification();
+	const [permissions, setPermission] = useState<IPermission[]>([]);
+	const [ids, setIds] = useState<string[]>([]);
+	const [loading, setLoading] = useState(false);
+
 	const { data: groups, isSuccess } = useGetOne<IGroups>('groups', { id: id });
-
-	const handleAddPermission = async () => {
-		console.log(permissionIds)
-		// try {
-		// 	const response = await groupsApi.addPermissionToGroup(id, permissionIds);
-		// 	setOpen(false);
-		// 	window.location.reload();
-		// } catch (error) {
-		// 	console.log('error');
-		// }
-	};
-
-	const handleUnPermission = async () => {
+	const addPermission = async () => {
 		try {
-			const response = await groupsApi.unPermissionToGroup(id, unPermissionIds);
-			setOpen(false);
-			window.location.reload();
+			await groupsApi.addPermissionToGroup(id, ids);
+			api['success']({
+				message: 'Thông báo',
+				description: 'Cập nhật thành công',
+			});
 		} catch (error) {
-			console.log()
+			api['error']({
+				message: 'Thông báo',
+				description: 'Bạn không có quyền cập nhật!',
+			});
 		}
-	}
+	};
 
 	useEffect(() => {
 		(async () => {
@@ -50,92 +43,80 @@ export const GroupDetail = () => {
 			} catch (error) {
 				console.log('error');
 			}
-		})();
+		})()
 	}, []);
-	const [fileList, setFileList] = useState([]);
-	const handleChange = ({ fileList: newFileList }) => setFileList(newFileList);
 
 	return (
-		<div className='wrapper__group'>
-			<div className="box-info">
-				<div className='header-title'>
-					<h4>Thông tin nhóm</h4>
-				</div>
-				<div className='form-groups'>
-					<Row gutter={40}>
-						<Col xl={10}>
-							<div className='upload-avatar'>
-								<Upload
-									action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
-									listType="picture-card"
-									fileList={fileList}
-									// onPreview={handlePreview}
-									onChange={handleChange}
-								>
-									Upload
-								</Upload>
-								{/* <Modal open={previewOpen} title={previewTitle} footer={null} onCancel={handleCancel}>
-									<img
-										alt="example"
-										style={{
-											width: '100%',
-										}}
-										src={previewImage}
-									/>
-								</Modal> */}
-							</div>
-							<div className='description'>
-								<h6>Mô tả</h6>
-								<Text>Oke hello</Text>
-							</div>
-						</Col>
-						<Col xl={14}>
-							<Form onFinish={handleAddPermission}>
-								<div className='group-name'>
-									<p>Tên nhóm</p>
-									<Input defaultValue="admin" />
+		<Spin size='large' spinning={!isSuccess}>
+			{contextHolder}
+			<div className='wrapper__group'>
+				<div className="box-info">
+					<div className='header-title'>
+						<h4>Thông tin nhóm</h4>
+					</div>
+					<div className='form-groups'>
+						<Row gutter={40}>
+							<Col xl={10}>
+								<div className='upload-avatar'>
+									<Dragger name="avatar" listType="picture-card" className="avatar-uploader">
+										Upload
+									</Dragger>
 								</div>
-								<div className='group-type'>
-									<p>Loại nhóm</p>
-									<Select
-										defaultValue="Nhân viên"
-										style={{ width: 120 }}
-										options={[
-											{ value: 'jack', label: 'Quản lí' },
-											{ value: 'lucy', label: 'Nhân viên' },
-											{ value: 'Yiminghe', label: 'Khách' }
-										]}
-									/>
+								<div className='description'>
+									<h6>Mô tả</h6>
+									<Text>Nhóm đang hoạt động</Text>
 								</div>
-								<div className='content-manager'>
-									{data.map((item: any, index) => (
+							</Col>
+							<Col xl={14}>
+								<Form>
+									<div className='group-name'>
+										<p>Tên nhóm</p>
+										{isSuccess && <Input defaultValue={groups?.name} disabled />}
+									</div>
+									<div className='group-type'>
+										<p>Loại nhóm</p>
+										<Select
+											defaultValue="Nhân viên"
+											style={{ width: 120 }}
+											options={[
+												{ value: 'jack', label: 'Quản lí' },
+												{ value: 'lucy', label: 'Nhân viên' },
+												{ value: 'Yiminghe', label: 'Khách' }
+											]}
+										/>
+									</div>
+									<div className='content-manager'>
 										<Checkbox.Group
 											style={{ width: '100%' }}
-											onChange={(value: any) => setPermissionIds(value)}
-											key={index}
+											onChange={(value: any) => setIds(value)}
+											defaultValue={groups?.roles?.map((value: any) => value.id)}
 										>
 											<div className='list-permission'>
-												<p>{item.group_name}</p>
+												<p>QUẢN LÍ TÀI KHOẢN</p>
 												<Row gutter={[50, 5]}>
-													{item.permission.map((value: any) => (
+													{permissions.length > 0 && permissions.map((value: any) => (
 														<Col xl={12} key={value.id}>
 															<Checkbox
-																disabled={value.id !== 4 ? false : true}
-																className={value.id !== 4 ? 'active' : ''}
-																value={value.id}>{value.name}
+																className='checkbox-value'
+																value={value.id}
+															>{`${value.name} tài khoản`}
 															</Checkbox>
 														</Col>
 													))}
 												</Row>
 											</div>
 										</Checkbox.Group>
-									))}
-								</div>
-							</Form>
-						</Col>
-					</Row>
+									</div>
+									{isSuccess && groups?.roles?.length > 0
+										? <Button type="primary" onClick={addPermission} danger>Update</Button>
+										: <Button type="primary" onClick={addPermission}>Create</Button>
+									}
+								</Form>
+							</Col>
+						</Row>
+					</div>
 				</div>
 			</div>
-		</div>
+		</Spin>
 	)
 }

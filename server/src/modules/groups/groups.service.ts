@@ -1,6 +1,8 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from 'nestjs-fireorm';
 import { BaseFirestoreRepository } from 'fireorm';
+import { extname } from 'path';
+import * as admin from 'firebase-admin';
 
 import { GroupEntity } from './entities/group.entity';
 import { CreateGroupDto } from './dto/create-group.dto';
@@ -99,7 +101,7 @@ export class GroupsService {
 			return this.repoGroup.update(groups);
 		}
 
-		groups.roles.push(...roles);
+		groups.roles = roles;
 		return this.repoGroup.update(groups)
 	};
 
@@ -117,6 +119,13 @@ export class GroupsService {
 			groups.roles = filterRole;
 			return this.repoGroup.update(groups);
 		}
+		return;
+	};
+
+	async uploadFile(file: Express.Multer.File) {
+		// const fileName = `${Math.random()}${extname(file.originalname)}`;
+		// console.log(fileName);
+		// await admin.storage().bucket().file(file.originalname).save(file.buffer);
 		return;
 	}
 

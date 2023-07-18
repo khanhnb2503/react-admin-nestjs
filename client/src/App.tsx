@@ -26,7 +26,6 @@ export const App = () => (
 		<Admin
 			dataProvider={dataProvider}
 			authProvider={authProvider}
-			layout={MyLayout}
 			loginPage={Login}
 			dashboard={DashBoard}
 		>
