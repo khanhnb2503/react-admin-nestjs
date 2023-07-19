@@ -9,13 +9,15 @@ import { CreateGroupDto } from './dto/create-group.dto';
 import { UpdateGroupDto } from './dto/update-group.dto';
 import { RequestUser } from 'src/decorators/user.decorator';
 import { PermissionsService } from '../permissions/permissions.service';
+import { ResourcesService } from '../resources/resources.service';
 import { Errors } from 'src/constants/errors';
 @Injectable()
 export class GroupsService {
 	constructor(
 		@InjectRepository(GroupEntity)
 		private repoGroup: BaseFirestoreRepository<GroupEntity>,
-		private permissionsService: PermissionsService
+		private permissionsService: PermissionsService,
+		private resourceService: ResourcesService
 	) { }
 
 	async create(groupDto: CreateGroupDto, user: RequestUser): Promise<GroupEntity> {
@@ -80,29 +82,51 @@ export class GroupsService {
 	): Promise<GroupEntity> {
 		const groups = await this.findByIdGroup(id);
 		const permissions = await this.permissionsService.findAll();
+		const resources = await this.resourceService.findAll();
+
 		if (!groups) {
 			throw new NotFoundException(Errors.GROUP_NOT_FOUND)
 		};
 
-		if (permissId.length < 0) {
-			throw new NotFoundException(Errors.GROUP_EMPTY)
+		let permissionRequest = [];
+		if(permissId) {
+			let result = permissId.map((item) => item.split('_'));
+			result.map((item) => item.map((item) => {
+				
+				permissionRequest.push({
+					actionId: item, resourceId: item
+				})
+			}))
 		};
 
-		const mapPermissIdRequest = new Map(permissId.map((id) => [id, id]));
-		const filterPermission = permissions.filter((item) =>
-			item.id === mapPermissIdRequest.get(item.id));
+		const mapResource = new Map(resources.map((value) => [value.id, value]));
+		const mapPermission = new Map(permissions.map((value) => [value.id, value]));
+
+		// console.log(permissionRequest)
 		let roles = [];
-		filterPermission.forEach((item) => roles.push(
-			{ id: item.id, action: item.name, resource: 'users' })
-		);
+		if(permissionRequest.length > 0) {
+			permissionRequest.map((role) => {
+				let existPermission = mapPermission.get(role.actionId);
+				let existResource = mapResource.get(role.resourceId);
+				if(existPermission && existResource) {
+					roles.push({
+						id: existPermission.id, 
+						action: existPermission.name,
+						resource: existResource.name
+					})
+				}
+			})
+		};
+
+		console.log(roles);
 
 		if (!groups.roles?.length) {
 			groups.roles = roles;
 			return this.repoGroup.update(groups);
 		}
-
+		
 		groups.roles = roles;
-		return this.repoGroup.update(groups)
+		return this.repoGroup.update(groups);
 	};
 
 	async unPermission(
@@ -127,7 +151,7 @@ export class GroupsService {
 		// console.log(fileName);
 		// await admin.storage().bucket().file(file.originalname).save(file.buffer);
 		return;
-	}
+	};
 
 	private async checkExistGroupName(name: string) {
 		const permissions = await this.repoGroup

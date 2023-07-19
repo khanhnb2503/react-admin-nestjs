@@ -14,6 +14,8 @@ import { AppService } from './app.service';
 import { GroupsModule } from '../groups/groups.module';
 import { PermissionsModule } from '../permissions/permissions.module';
 import { RolesModule } from '../roles/role.module';
+import { ProductsModule } from '../products/products.module'; 
+import { ResourcesModule } from '../resources/resources.module';
 
 @Module({
   imports: [
@@ -55,6 +57,8 @@ import { RolesModule } from '../roles/role.module';
     AuthModule,
 		GroupsModule,
 		PermissionsModule,
+    ProductsModule,
+    ResourcesModule
   ],
   controllers: [AppController],
   providers: [

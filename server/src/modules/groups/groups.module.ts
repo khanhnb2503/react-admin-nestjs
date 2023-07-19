@@ -1,6 +1,7 @@
 import { Module, forwardRef } from '@nestjs/common';
 import { FireormModule } from 'nestjs-fireorm';
 
+import { ResourcesModule } from '../resources/resources.module';
 import { UsersModule } from '../users/users.module';
 import { GroupEntity } from './entities/group.entity';
 import { GroupsService } from './groups.service';
@@ -12,6 +13,7 @@ import { PermissionsModule } from '../permissions/permissions.module';
 		FireormModule.forFeature([GroupEntity]),
 		forwardRef(() => UsersModule),
 		PermissionsModule,
+		ResourcesModule
 	],
   controllers: [GroupsController],
   providers: [GroupsService],
