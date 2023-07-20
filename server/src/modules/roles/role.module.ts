@@ -14,8 +14,8 @@ import { GroupsModule } from '../groups/groups.module';
           return group?.roles?.map((grant) => {
             return { 
               role: group.name, 
-              resource: grant.resource,
-              action: grant.action
+              // resource: grant.resource,
+              // action: grant.action
             }
           })
         });

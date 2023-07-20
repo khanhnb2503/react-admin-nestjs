@@ -1,6 +1,8 @@
 export interface IRole {
-  name: string;
-  permissionId: string;
+  actionId: string;
+  actionName: string;
+  resourceId: string;
+  resourceName: string;
 }
 
 export interface IGroups {

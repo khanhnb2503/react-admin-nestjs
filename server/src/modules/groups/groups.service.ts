@@ -88,37 +88,37 @@ export class GroupsService {
 			throw new NotFoundException(Errors.GROUP_NOT_FOUND)
 		};
 
-		let permissionRequest = [];
-		if(permissId) {
-			let result = permissId.map((item) => item.split('_'));
-			result.map((item) => item.map((item) => {
-				
-				permissionRequest.push({
-					actionId: item, resourceId: item
-				})
-			}))
-		};
-
 		const mapResource = new Map(resources.map((value) => [value.id, value]));
 		const mapPermission = new Map(permissions.map((value) => [value.id, value]));
 
-		// console.log(permissionRequest)
+		let permissionRequest = [];
+		if(permissId) {
+			let result = permissId.map((item) => item.split('_'));
+			result.map((item) => permissionRequest.push({
+				actionId: item[0],
+				resourceId: item[1]
+			}))
+		};
+
 		let roles = [];
 		if(permissionRequest.length > 0) {
 			permissionRequest.map((role) => {
 				let existPermission = mapPermission.get(role.actionId);
 				let existResource = mapResource.get(role.resourceId);
+				if(!existPermission || !existResource) {
+					throw new NotFoundException(Errors.PERMISSION_NOT_FOUND)
+				};
+
 				if(existPermission && existResource) {
 					roles.push({
-						id: existPermission.id, 
-						action: existPermission.name,
-						resource: existResource.name
+						actionId: existPermission.id, 
+						actionName: existPermission.name,
+						resourceId: existResource.id,
+						resourceName: existResource.name,
 					})
-				}
+				};
 			})
 		};
-
-		console.log(roles);
 
 		if (!groups.roles?.length) {
 			groups.roles = roles;
@@ -139,7 +139,7 @@ export class GroupsService {
 		};
 
 		if (groups.roles.length > 0) {
-			const filterRole = groups.roles.filter((role) => !permissId.includes(role.id));
+			const filterRole = groups.roles.filter((role) => !permissId.includes(role.actionId));
 			groups.roles = filterRole;
 			return this.repoGroup.update(groups);
 		}

@@ -27,7 +27,10 @@ const Login = () => {
 		const { accessToken, refreshToken } = data;
 		localStorage.setItem('accessToken', JSON.stringify(accessToken));
 		localStorage.setItem('refreshToken', JSON.stringify(refreshToken));
-		setTimeout((() => { navigate('/') }), 3000)
+		setTimeout((() => { 
+			navigate('/')
+			location.reload();
+		}), 3000)
 	};
 
 	return (

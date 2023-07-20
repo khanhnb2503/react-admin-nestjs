@@ -28,17 +28,22 @@ export class GrantPermission {
 	@ApiProperty({
     description: 'Id permission',
   })
-	id: string;
+	actionId: string;
+
+	@ApiProperty({
+    description: 'Tên permission',
+  })
+	actionName: any;
+
+	@ApiProperty({
+    description: 'Id tài nguyên cung cấp',
+  })
+	resourceId: string;
 
 	@ApiProperty({
     description: 'Tên tài nguyên cung cấp',
   })
-	resource: string;
-
-	@ApiProperty({
-    description: 'Kiểu hành động',
-  })
-	action: string;
+	resourceName: any;
 }
 
 @Collection('groups')

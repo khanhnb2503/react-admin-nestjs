@@ -52,7 +52,7 @@ import { ResourcesModule } from '../resources/resources.module';
         },
       }),
     }),
-    RolesModule,
+    // RolesModule,
     UsersModule,
     AuthModule,
 		GroupsModule,

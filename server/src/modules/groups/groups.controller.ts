@@ -12,7 +12,12 @@ import {GroupEntity} from './entities/group.entity';
 import { GrantPermission } from './entities/group.entity'; 
 import { UseUploadFile } from 'src/decorators/file.decorator';
 import { RolesGuard } from 'src/guards/role.guard';
-import { RequirePermission, Permissions } from 'src/decorators/role.decorator';
+import { 
+	RequirePermission, 
+	Permissions,
+	RequireResource,
+	Resources
+} from 'src/decorators/role.decorator';
 
 
 @ApiTags('Groups')
@@ -68,8 +73,9 @@ export class GroupsController {
 		return this.groupsService.remove(id);
 	}
 
-	@RequirePermission(Permissions.CREATE)
 	@UseGuards(AccessTokenGuard, RolesGuard)
+	@RequirePermission(Permissions.CREATE)
+	@RequireResource(Resources.USERS)
 	@Post('add-permission/:id')
 	@ApiOperation({
 		description: 'Thêm quyền vào groups',
