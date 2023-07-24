@@ -49,6 +49,9 @@ export class GroupsController {
 		}).json(groups);
 	} 
 
+	@UseGuards(AccessTokenGuard, RolesGuard)
+	@RequirePermission(Permissions.READ)
+	@RequireResource(Resources.POWER)
 	@Get(':id')
 	@ApiOperation({
 		description: 'Chi tiết 1 groups',
@@ -74,8 +77,8 @@ export class GroupsController {
 	}
 
 	@UseGuards(AccessTokenGuard, RolesGuard)
-	@RequirePermission(Permissions.CREATE)
-	@RequireResource(Resources.USERS)
+	@RequirePermission(Permissions.UPDATE)
+	@RequireResource(Resources.POWER)
 	@Post('add-permission/:id')
 	@ApiOperation({
 		description: 'Thêm quyền vào groups',

@@ -23,6 +23,7 @@ import { ProductCreate } from './resources/products/ProductCreate';
 
 import Login from './page/auth/Login';
 import DashBoard from './components/Dashboard';
+import MyLayouts from './components/Layouts';
 
 export const App = () => (
 	<div className='App'>
@@ -30,7 +31,8 @@ export const App = () => (
 			dataProvider={dataProvider}
 			authProvider={authProvider}
 			loginPage={Login}
-			dashboard={DashBoard}
+			// dashboard={DashBoard}
+			layout={MyLayouts}
 		>
 			<Resource
 				name="users"
@@ -38,14 +40,12 @@ export const App = () => (
 				show={UserDetail}
 				create={UserCreate}
 				edit={EditUser}
-				icon={UserIcon}
 			/>
 
 			<Resource
 				name="products"
 				list={ProductList}
 				create={ProductCreate}
-				icon={ProductionQuantityLimitsIcon}
 			/>
 			<Resource
 				name="groups"
@@ -53,7 +53,6 @@ export const App = () => (
 				create={GroupCreate}
 				show={GroupDetail}
 				edit={GroupEdit}
-				icon={Diversity3Icon}
 			/>
 		</Admin>
 	</div>

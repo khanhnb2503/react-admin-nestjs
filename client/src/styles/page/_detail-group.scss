@@ -61,6 +61,15 @@
     margin-bottom: 20px;
   }
 
+  .power {
+    margin-bottom: 23px;
+    h6 {
+      margin: 0;
+      text-transform: uppercase;
+      font-size: 13px;
+    }
+  }
+
   .list-permission {
     p {
       text-transform: uppercase;
@@ -87,5 +96,9 @@
       font-weight: 500;
       font-size: 12px;
     }
+  }
+
+  .hidden-checkbox {
+    display:none;
   }
 }

@@ -118,11 +118,29 @@ export class UsersService {
 		}
 	}
 
-	private async findByUserId(id: string) {
+	async findByUserId(id: string) {
 		const user = await this.repoUser.findById(id);
 		if (!user) {
 			throw new NotFoundException(Errors.USER_NOT_FOUND)
 		};
 		return user;
+	}
+
+	async profile (id: string) {
+		const users = await this.repoUser.findById(id);
+		if (!users) {
+			throw new NotFoundException(Errors.USER_NOT_FOUND)
+		};
+		const roles = await this.groupService.findOne(users.roleId);
+		let resources = [];
+		if(roles) {
+			roles.roles.map((role: any) => {
+				let resource = role.resourceName;
+				if(resources.indexOf(resource) === -1) {
+					resources.push(resource);
+				}
+			});
+		}
+		return {resources, users};
 	}
 }

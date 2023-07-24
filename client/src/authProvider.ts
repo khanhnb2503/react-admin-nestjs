@@ -5,7 +5,6 @@ import {baseUrl} from './constants/baseurl';
 
 export const authProvider: AuthProvider = {
 	login: async ({username, password}) => {
-		console.log(username, password);
 		try {
 			const {data, status} = await axios.post(
 				`${baseUrl}/auth/login`,

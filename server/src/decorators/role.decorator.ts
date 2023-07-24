@@ -1,15 +1,16 @@
 import { SetMetadata } from '@nestjs/common';
 
 export enum Permissions {
-  READ = 'read',
-  CREATE = 'create',
-  UPDATE = 'update',
-  DELETE = 'delete'
+  READ = 'Xem',
+  CREATE = 'Thêm',
+  UPDATE = 'Sửa',
+  DELETE = 'Xóa'
 };
 
 export enum Resources {
   USERS = 'Tài khoản',
-  PRODUCTS = 'Sản phẩm'
+  PRODUCTS = 'Sản phẩm',
+  POWER = 'Quyền hạn'
 }
 
 export const RequirePermission =
